@@ -1,10 +1,10 @@
-package ca.qc.cstj.andromia
+package ca.qc.cstj.andromia.Activities
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import kotlinx.android.synthetic.main.activity_map.*
+import ca.qc.cstj.andromia.R
 
-class MainActivity : AppCompatActivity() {
+class MapActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)

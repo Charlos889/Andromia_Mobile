@@ -4,10 +4,14 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Activities.MapActivity">
+    tools:context=".Activities.MapActivity" android:background="@color/backgroundMap">
     <ImageView
         android:id="@+id/imgMap"
-        android:layout_width="300dp"
-        android:layout_height="300dp"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleX="3.5"
+        android:scaleY="3.5"
+        android:scrollX="100px"
+        android:scrollY="200px"
         android:src="@drawable/andromia" />
 </android.support.constraint.ConstraintLayout>

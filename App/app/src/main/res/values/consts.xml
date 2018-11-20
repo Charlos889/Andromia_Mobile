@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="BASE_SCALE" format="float" type="dimen">3.5</item>
+</resources>

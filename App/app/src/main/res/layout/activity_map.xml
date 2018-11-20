@@ -9,12 +9,10 @@
 
     <ImageView
         android:id="@+id/imgMap"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:scaleX="3.5"
-        android:scaleY="3.5"
-        android:transformPivotX="0px"
-        android:transformPivotY="0px"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleX="@dimen/BASE_SCALE"
+        android:scaleY="@dimen/BASE_SCALE"
         android:src="@drawable/andromia" />
 
 </android.support.constraint.ConstraintLayout>

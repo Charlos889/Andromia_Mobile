@@ -7,18 +7,16 @@ import android.animation.PropertyValuesHolder
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.view.GestureDetectorCompat
+import android.util.TypedValue
 import android.view.GestureDetector
 import android.view.MotionEvent
 import android.view.View
-import android.view.animation.Animation
-import android.view.animation.AnimationSet
-import android.view.animation.ScaleAnimation
 import ca.qc.cstj.andromia.R
 import kotlinx.android.synthetic.main.activity_map.*
-import java.time.Duration
-import java.util.*
+import kotlin.math.absoluteValue
 
 class MapActivity : AppCompatActivity(), GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
+
     private var x1 : Float = 0f
     private var x2 : Float = 0f
     private var y1 : Float = 0f
@@ -76,14 +74,30 @@ class MapActivity : AppCompatActivity(), GestureDetector.OnGestureListener, Gest
     }
 
     override fun onDoubleTap(p0: MotionEvent?): Boolean {
-        val pvhX = PropertyValuesHolder.ofFloat(View.SCALE_X, imgMap.scaleX, 1f)
-        val pvhY = PropertyValuesHolder.ofFloat(View.SCALE_Y, imgMap.scaleY, 1f)
-        val scaleAnimation = ObjectAnimator.ofPropertyValuesHolder(imgMap, pvhX, pvhY)
+
+        var scaleAnimation : ObjectAnimator?
+
+        if (imgMap.scaleX == 1f && imgMap.scaleY == 1f) {
+            var test = TypedValue()
+
+            resources.getValue(R.dimen.BASE_SCALE, test, true)
+
+            val pvhX = PropertyValuesHolder.ofFloat(View.SCALE_X, imgMap.scaleX, test.float)
+            val pvhY = PropertyValuesHolder.ofFloat(View.SCALE_Y, imgMap.scaleY, test.float)
+            scaleAnimation = ObjectAnimator.ofPropertyValuesHolder(imgMap, pvhX, pvhY)
+        } else {
+            val pvhX = PropertyValuesHolder.ofFloat(View.SCALE_X, imgMap.scaleX, 1f)
+            val pvhY = PropertyValuesHolder.ofFloat(View.SCALE_Y, imgMap.scaleY, 1f)
+            val trX = PropertyValuesHolder.ofFloat(View.TRANSLATION_X, imgMap.translationX, 0f)
+            val trY = PropertyValuesHolder.ofFloat(View.TRANSLATION_Y, imgMap.translationY, 0f)
+            scaleAnimation = ObjectAnimator.ofPropertyValuesHolder(imgMap, pvhX, pvhY, trX, trY)
+        }
 
         val setAnimation = AnimatorSet()
         setAnimation.play(scaleAnimation)
         setAnimation.duration = 1000
         setAnimation.start()
+
         return true
     }
 
@@ -102,10 +116,11 @@ class MapActivity : AppCompatActivity(), GestureDetector.OnGestureListener, Gest
                 if (event.pointerCount == 1) {
                     val newX = event.getX(0)
                     val newY = event.getY(0)
-                    val scrollX = (newX - x1) / 2
-                    val scrollY = (newY - y1) / 2
+                    val scrollX = (newX - x1)
+                    val scrollY = (newY - y1)
 
-                    imgMap.scrollBy(-scrollX.toInt(), -scrollY.toInt())
+                    imgMap.translationX  += scrollX
+                    imgMap.translationY += scrollY
                     x1 = newX
                     y1 = newY
                 } else if (event.pointerCount == 2) {

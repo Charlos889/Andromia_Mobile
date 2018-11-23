@@ -4,9 +4,13 @@ import android.animation.Animator
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
+import android.graphics.Matrix
+import android.graphics.Point
+import android.graphics.PointF
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.view.GestureDetectorCompat
+import android.util.Log
 import android.util.TypedValue
 import android.view.GestureDetector
 import android.view.MotionEvent
@@ -27,20 +31,6 @@ class MapActivity : AppCompatActivity(), GestureDetector.OnGestureListener, Gest
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map)
-
-        /*ctlMap.setOnTouchListener(View.OnTouchListener { v, event ->
-
-            when (event.actionMasked) {
-                MotionEvent.ACTION_DOWN -> {
-                }
-                MotionEvent.ACTION_POINTER_DOWN -> {
-                    //txtTest.text = imgMap.scrollBy(-100, -100).toString()
-                }
-
-            }
-
-            return@OnTouchListener true
-        })*/
 
         gDetector = GestureDetectorCompat(this, this)
 
@@ -74,7 +64,6 @@ class MapActivity : AppCompatActivity(), GestureDetector.OnGestureListener, Gest
     }
 
     override fun onDoubleTap(p0: MotionEvent?): Boolean {
-
         var scaleAnimation : ObjectAnimator?
 
         if (imgMap.scaleX == 1f && imgMap.scaleY == 1f) {
@@ -84,12 +73,23 @@ class MapActivity : AppCompatActivity(), GestureDetector.OnGestureListener, Gest
 
             val pvhX = PropertyValuesHolder.ofFloat(View.SCALE_X, imgMap.scaleX, test.float)
             val pvhY = PropertyValuesHolder.ofFloat(View.SCALE_Y, imgMap.scaleY, test.float)
-            scaleAnimation = ObjectAnimator.ofPropertyValuesHolder(imgMap, pvhX, pvhY)
+
+            val point = ZoomIn(p0!!.x, p0.y)
+            if (point != null) {
+                val trX = PropertyValuesHolder.ofFloat(View.TRANSLATION_X, imgMap.translationX, point.x)
+                val trY = PropertyValuesHolder.ofFloat(View.TRANSLATION_Y, imgMap.translationY, point.y)
+
+                scaleAnimation = ObjectAnimator.ofPropertyValuesHolder(imgMap, pvhX, pvhY, trX, trY)
+            } else {
+                scaleAnimation = null
+            }
         } else {
             val pvhX = PropertyValuesHolder.ofFloat(View.SCALE_X, imgMap.scaleX, 1f)
             val pvhY = PropertyValuesHolder.ofFloat(View.SCALE_Y, imgMap.scaleY, 1f)
+
             val trX = PropertyValuesHolder.ofFloat(View.TRANSLATION_X, imgMap.translationX, 0f)
             val trY = PropertyValuesHolder.ofFloat(View.TRANSLATION_Y, imgMap.translationY, 0f)
+
             scaleAnimation = ObjectAnimator.ofPropertyValuesHolder(imgMap, pvhX, pvhY, trX, trY)
         }
 
@@ -133,5 +133,26 @@ class MapActivity : AppCompatActivity(), GestureDetector.OnGestureListener, Gest
         }
 
         return super.onTouchEvent(event)
+    }
+
+    private fun ZoomIn(x : Float, y : Float) : PointF? {
+        val posView = IntArray(2)
+        imgMap.getLocationOnScreen(posView)
+
+        val matrix = FloatArray(9)
+        imgMap.imageMatrix.getValues(matrix)
+
+        val posX = x - (posView[0] + matrix[Matrix.MTRANS_X])
+        val posY = y - (posView[1] + matrix[Matrix.MTRANS_Y])
+
+        Log.d("Position", "X : " + posView[0] + ", Y : " + matrix[Matrix.MTRANS_X])
+        
+        if (posX >= 0
+            && posY >= 0
+            && posX <= (matrix[Matrix.MSCALE_X] * imgMap.drawable.intrinsicWidth)
+            && posY <= (matrix[Matrix.MSCALE_Y] * imgMap.drawable.intrinsicHeight))
+            return PointF()
+        else
+            return null
     }
 }

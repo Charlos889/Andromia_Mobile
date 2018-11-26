@@ -14,17 +14,21 @@ import android.util.Log
 import android.util.TypedValue
 import android.view.GestureDetector
 import android.view.MotionEvent
+import android.view.ScaleGestureDetector
 import android.view.View
+import android.widget.ImageView
 import ca.qc.cstj.andromia.R
+import ca.qc.cstj.andromia.R.id.imgMap
 import kotlinx.android.synthetic.main.activity_map.*
 import kotlin.math.absoluteValue
 
 class MapActivity : AppCompatActivity(), GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
 
     private var x1 : Float = 0f
-    private var x2 : Float = 0f
+    private var x2 : Float? = null
     private var y1 : Float = 0f
-    private var y2 : Float = 0f
+    private var y2 : Float? = null
+    private var setAnimation = AnimatorSet()
 
     private var gDetector: GestureDetectorCompat? = null
 
@@ -35,6 +39,7 @@ class MapActivity : AppCompatActivity(), GestureDetector.OnGestureListener, Gest
         gDetector = GestureDetectorCompat(this, this)
 
         gDetector?.setOnDoubleTapListener(this)
+        ScaleDetector = ScaleGestureDetector(this, ScaleListener)
     }
 
     override fun onShowPress(p0: MotionEvent?) {
@@ -64,39 +69,42 @@ class MapActivity : AppCompatActivity(), GestureDetector.OnGestureListener, Gest
     }
 
     override fun onDoubleTap(p0: MotionEvent?): Boolean {
-        var scaleAnimation : ObjectAnimator?
 
-        if (imgMap.scaleX == 1f && imgMap.scaleY == 1f) {
-            var test = TypedValue()
+        if (!setAnimation.isRunning) {
+            var scaleAnimation : ObjectAnimator?
 
-            resources.getValue(R.dimen.BASE_SCALE, test, true)
+            if (imgMap.scaleX == 1f && imgMap.scaleY == 1f) {
+                var BaseScale = TypedValue()
 
-            val pvhX = PropertyValuesHolder.ofFloat(View.SCALE_X, imgMap.scaleX, test.float)
-            val pvhY = PropertyValuesHolder.ofFloat(View.SCALE_Y, imgMap.scaleY, test.float)
+                resources.getValue(R.dimen.BASE_SCALE, BaseScale, true)
 
-            val point = ZoomIn(p0!!.x, p0.y)
-            if (point != null) {
-                val trX = PropertyValuesHolder.ofFloat(View.TRANSLATION_X, imgMap.translationX, point.x)
-                val trY = PropertyValuesHolder.ofFloat(View.TRANSLATION_Y, imgMap.translationY, point.y)
+                val pvhX = PropertyValuesHolder.ofFloat(View.SCALE_X, imgMap.scaleX, BaseScale.float)
+                val pvhY = PropertyValuesHolder.ofFloat(View.SCALE_Y, imgMap.scaleY, BaseScale.float)
+
+                val point = ZoomIn(p0!!.x, p0.y, BaseScale)
+                if (point != null) {
+                    val trX = PropertyValuesHolder.ofFloat(View.TRANSLATION_X, imgMap.translationX, point.x)
+                    val trY = PropertyValuesHolder.ofFloat(View.TRANSLATION_Y, imgMap.translationY, point.y)
+
+                    scaleAnimation = ObjectAnimator.ofPropertyValuesHolder(imgMap, pvhX, pvhY, trX, trY)
+                } else {
+                    scaleAnimation = null
+                }
+            } else {
+                val pvhX = PropertyValuesHolder.ofFloat(View.SCALE_X, imgMap.scaleX, 1f)
+                val pvhY = PropertyValuesHolder.ofFloat(View.SCALE_Y, imgMap.scaleY, 1f)
+
+                val trX = PropertyValuesHolder.ofFloat(View.TRANSLATION_X, imgMap.translationX, 0f)
+                val trY = PropertyValuesHolder.ofFloat(View.TRANSLATION_Y, imgMap.translationY, 0f)
 
                 scaleAnimation = ObjectAnimator.ofPropertyValuesHolder(imgMap, pvhX, pvhY, trX, trY)
-            } else {
-                scaleAnimation = null
             }
-        } else {
-            val pvhX = PropertyValuesHolder.ofFloat(View.SCALE_X, imgMap.scaleX, 1f)
-            val pvhY = PropertyValuesHolder.ofFloat(View.SCALE_Y, imgMap.scaleY, 1f)
 
-            val trX = PropertyValuesHolder.ofFloat(View.TRANSLATION_X, imgMap.translationX, 0f)
-            val trY = PropertyValuesHolder.ofFloat(View.TRANSLATION_Y, imgMap.translationY, 0f)
-
-            scaleAnimation = ObjectAnimator.ofPropertyValuesHolder(imgMap, pvhX, pvhY, trX, trY)
+            setAnimation = AnimatorSet()
+            setAnimation.play(scaleAnimation)
+            setAnimation.duration = 1000
+            setAnimation.start()
         }
-
-        val setAnimation = AnimatorSet()
-        setAnimation.play(scaleAnimation)
-        setAnimation.duration = 1000
-        setAnimation.start()
 
         return true
     }
@@ -123,19 +131,21 @@ class MapActivity : AppCompatActivity(), GestureDetector.OnGestureListener, Gest
                     imgMap.translationY += scrollY
                     x1 = newX
                     y1 = newY
-                } else if (event.pointerCount == 2) {
-
+                }
+                else {
+                    ScaleDetector!!.onTouchEvent(event)
                 }
             }
             else -> {
                 gDetector?.onTouchEvent(event)
+                ScaleDetector!!.onTouchEvent(event)
             }
         }
 
         return super.onTouchEvent(event)
     }
 
-    private fun ZoomIn(x : Float, y : Float) : PointF? {
+    private fun ZoomIn(x : Float, y : Float, baseScale : TypedValue) : PointF? {
         val posView = IntArray(2)
         imgMap.getLocationOnScreen(posView)
 
@@ -145,14 +155,33 @@ class MapActivity : AppCompatActivity(), GestureDetector.OnGestureListener, Gest
         val posX = x - (posView[0] + matrix[Matrix.MTRANS_X])
         val posY = y - (posView[1] + matrix[Matrix.MTRANS_Y])
 
-        Log.d("Position", "X : " + posView[0] + ", Y : " + matrix[Matrix.MTRANS_X])
-        
+        val widthMap = (matrix[Matrix.MSCALE_X] * imgMap.drawable.intrinsicWidth)
+        val heightMap = (matrix[Matrix.MSCALE_Y] * imgMap.drawable.intrinsicHeight)
+
         if (posX >= 0
             && posY >= 0
-            && posX <= (matrix[Matrix.MSCALE_X] * imgMap.drawable.intrinsicWidth)
-            && posY <= (matrix[Matrix.MSCALE_Y] * imgMap.drawable.intrinsicHeight))
-            return PointF()
+            && posX <= widthMap
+            && posY <= heightMap)
+            return PointF(((widthMap / 2) * baseScale.float) - (posX * baseScale.float)
+                            , ((heightMap / 2) * baseScale.float) - (posY * baseScale.float))
         else
             return null
     }
+
+    private val ScaleListener = object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
+        override fun onScale(detector: ScaleGestureDetector?): Boolean {
+            val scale = imgMap.scaleX * detector!!.scaleFactor
+
+            if (scale >= 1f) {
+                imgMap.scaleX = scale
+                imgMap.scaleY = scale
+            } else {
+                imgMap.scaleX = 1f
+                imgMap.scaleY = 1f
+            }
+            return true
+        }
+    }
+
+    private var ScaleDetector : ScaleGestureDetector? = null;
 }

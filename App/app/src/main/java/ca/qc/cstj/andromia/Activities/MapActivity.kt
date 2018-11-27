@@ -127,10 +127,15 @@ class MapActivity : AppCompatActivity(), GestureDetector.OnGestureListener, Gest
                     val scrollX = (newX - x1)
                     val scrollY = (newY - y1)
 
-                    imgMap.translationX  += scrollX
-                    imgMap.translationY += scrollY
-                    x1 = newX
-                    y1 = newY
+                    if (verifierTranslationValide(scrollX, true)) {
+                        imgMap.translationX  += scrollX
+                        x1 = newX
+                    }
+
+                    if (verifierTranslationValide(scrollY, false)) {
+                        imgMap.translationY += scrollY
+                        y1 = newY
+                    }
                 }
                 else {
                     ScaleDetector!!.onTouchEvent(event)
@@ -155,17 +160,43 @@ class MapActivity : AppCompatActivity(), GestureDetector.OnGestureListener, Gest
         val posX = x - (posView[0] + matrix[Matrix.MTRANS_X])
         val posY = y - (posView[1] + matrix[Matrix.MTRANS_Y])
 
-        val widthMap = (matrix[Matrix.MSCALE_X] * imgMap.drawable.intrinsicWidth)
-        val heightMap = (matrix[Matrix.MSCALE_Y] * imgMap.drawable.intrinsicHeight)
+        val tailleMap = ObtenirTailleMap()
 
         if (posX >= 0
             && posY >= 0
-            && posX <= widthMap
-            && posY <= heightMap)
-            return PointF(((widthMap / 2) * baseScale.float) - (posX * baseScale.float)
-                            , ((heightMap / 2) * baseScale.float) - (posY * baseScale.float))
+            && posX <= tailleMap.x
+            && posY <= tailleMap.y)
+            return PointF(((tailleMap.x / 2) * baseScale.float) - (posX * baseScale.float)
+                            , ((tailleMap.y / 2) * baseScale.float) - (posY * baseScale.float))
         else
             return null
+    }
+
+    private fun ObtenirTailleMap() : PointF {
+        val matrix = FloatArray(9)
+        imgMap.imageMatrix.getValues(matrix)
+
+        val widthMap = (matrix[Matrix.MSCALE_X] * imgMap.drawable.intrinsicWidth)
+        val heightMap = (matrix[Matrix.MSCALE_Y] * imgMap.drawable.intrinsicHeight)
+
+        return PointF(widthMap, heightMap)
+    }
+
+    private fun verifierTranslationValide(trans : Float, transHori : Boolean) : Boolean {
+        var curr = 0f
+        val tailleMap = ObtenirTailleMap()
+
+        if (transHori) {
+            curr = imgMap.translationX
+
+            return ((tailleMap.x * imgMap.scaleX / 2) < (tailleMap.x * imgMap.scaleX) - (curr + trans)
+                    && (tailleMap.x * imgMap.scaleX / 2) < (tailleMap.x * imgMap.scaleX) + (curr + trans))
+        } else {
+            curr = imgMap.translationY
+
+            return ((tailleMap.y * imgMap.scaleY / 2) < (tailleMap.y * imgMap.scaleY) - (curr + trans)
+                    && (tailleMap.y * imgMap.scaleY / 2) < (tailleMap.y * imgMap.scaleY) + (curr + trans))
+        }
     }
 
     private val ScaleListener = object : ScaleGestureDetector.SimpleOnScaleGestureListener() {

@@ -15,4 +15,9 @@
         android:scaleY="@dimen/BASE_SCALE"
         android:src="@drawable/andromia" />
 
+    <Button
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:translationX="-20"
+        android:background="@drawable/point_position"/>
 </android.support.constraint.ConstraintLayout>

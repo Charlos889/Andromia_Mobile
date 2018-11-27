@@ -1,28 +1,46 @@
-package ca.qc.cstj.andromia.Activities
+package ca.qc.cstj.andromia.activities
 
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.support.v7.widget.CardView
+import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
-import ca.qc.cstj.andromia.Adapters.UnitsAdapter
-import ca.qc.cstj.andromia.Objects.Units
+import ca.qc.cstj.andromia.adapters.UnitsRecyclerViewAdapter
+import ca.qc.cstj.andromia.models.Unit
 import ca.qc.cstj.andromia.R
+import com.github.kittinunf.fuel.Fuel
+import com.github.kittinunf.fuel.gson.responseObject
+import com.google.gson.Gson
 import kotlinx.android.synthetic.main.activity_units.*
 
 class UnitsActivity : AppCompatActivity() {
+
+    private var units : MutableList<Unit> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_units)
 
-        val lstTests = mutableListOf<Units>()
-        lstTests.add(0,Units())
-        lstTests.add(1,Units())
-        lstTests.add(2,Units())
-        lstTests.add(3,Units())
-        lstTests.add(4,Units())
 
-        this.rcvUnits.adapter = UnitsAdapter(lstTests)
-        this.rcvUnits.layoutManager = LinearLayoutManager(this)
+        rcvUnits.layoutManager = GridLayoutManager(this, 2)
+        rcvUnits.adapter = UnitsRecyclerViewAdapter(units)
+
+        Fuel.Companion.get("https://andromia-equipe2-ichigolatortue.c9users.io/inventaires/units")
+                        .responseObject<Unit> { request, response, result ->
+                            when(response.statusCode) {
+                                200 -> {
+                                    createUnitList(result.get())
+                                }
+                            }
+                        }
+
+
+
+    }
+
+    private fun createUnitList(unit: Unit) {
+        units.clear()
+        units.add(unit)
+        rcvUnits.adapter!!.notifyDataSetChanged()
+
     }
 }

@@ -1,4 +1,4 @@
-package ca.qc.cstj.andromia.Activities
+package ca.qc.cstj.andromia.activities
 
 import android.app.Activity
 import android.content.Intent
@@ -7,7 +7,6 @@ import android.os.Bundle
 import android.widget.Toast
 import ca.qc.cstj.andromia.R
 import com.google.zxing.integration.android.IntentIntegrator
-import com.google.zxing.integration.android.IntentResult
 import kotlinx.android.synthetic.main.activity_scan.*
 
 class ScanActivity : AppCompatActivity() {

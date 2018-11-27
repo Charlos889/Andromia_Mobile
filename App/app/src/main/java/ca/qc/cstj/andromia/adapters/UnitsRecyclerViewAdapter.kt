@@ -1,21 +1,20 @@
-package ca.qc.cstj.andromia.Adapters
+package ca.qc.cstj.andromia.adapters
 
 import android.support.v7.widget.RecyclerView
-import android.system.Os.bind
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import ca.qc.cstj.andromia.Objects.Units
+import ca.qc.cstj.andromia.models.Units
 import ca.qc.cstj.andromia.R
 import com.squareup.picasso.Picasso
 import kotlinx.android.synthetic.main.card_unit.view.*
 
-class UnitsAdapter(private val lstUnits : List<Units>) : RecyclerView.Adapter<UnitsAdapter.ViewHolder>(){
+class UnitsRecyclerViewAdapter(private val lstUnits : List<Units>) : RecyclerView.Adapter<UnitsRecyclerViewAdapter.ViewHolder>(){
 
 
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): UnitsAdapter.ViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context).inflate(R.layout.card_unit, parent, false)
 
         return ViewHolder(view)
@@ -23,7 +22,7 @@ class UnitsAdapter(private val lstUnits : List<Units>) : RecyclerView.Adapter<Un
 
     override fun getItemCount() = lstUnits.size
 
-    override fun onBindViewHolder(holder: UnitsAdapter.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val unit = lstUnits[position]
 
         holder.bind(unit)
@@ -32,10 +31,10 @@ class UnitsAdapter(private val lstUnits : List<Units>) : RecyclerView.Adapter<Un
 
     inner class ViewHolder(view : View) :RecyclerView.ViewHolder(view) {
 
-        val imgView = view.imgUnit as ImageView
+        val imgUnit : ImageView = view.imgUnit
 
         fun bind(unit : Units) {
-            Picasso.get().load("https://assets.andromia.science/img/units/23.png").into(imgView)
-        }
+            Picasso.with(imgUnit.context).load("https://assets.andromia.science/img/units/23.png").placeholder(R.mipmap.ic_launcher_round).into(imgUnit)
+    }
     }
 }

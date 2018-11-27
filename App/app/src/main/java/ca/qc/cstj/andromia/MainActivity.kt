@@ -3,9 +3,9 @@ package ca.qc.cstj.andromia
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import ca.qc.cstj.andromia.Activities.ScanActivity
-import ca.qc.cstj.andromia.Activities.UnitsActivity
+import ca.qc.cstj.andromia.activities.UnitsActivity
 import kotlinx.android.synthetic.main.activity_main.*
+
 
 class MainActivity : AppCompatActivity() {
 
@@ -17,5 +17,6 @@ class MainActivity : AppCompatActivity() {
             val intent = Intent(this, UnitsActivity::class.java)
             startActivity(intent)
         }
+
     }
 }

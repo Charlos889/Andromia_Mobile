@@ -7,6 +7,7 @@ import android.animation.PropertyValuesHolder
 import android.graphics.Matrix
 import android.graphics.Point
 import android.graphics.PointF
+import android.graphics.RectF
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.view.GestureDetectorCompat
@@ -24,12 +25,12 @@ import kotlin.math.absoluteValue
 
 class MapActivity : AppCompatActivity(), GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
 
+    private val positionJoueur = PointF(359f, 416f)
     private var x1 : Float = 0f
     private var x2 : Float? = null
     private var y1 : Float = 0f
     private var y2 : Float? = null
     private var setAnimation = AnimatorSet()
-
     private var gDetector: GestureDetectorCompat? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -72,6 +73,7 @@ class MapActivity : AppCompatActivity(), GestureDetector.OnGestureListener, Gest
 
         if (!setAnimation.isRunning) {
             var scaleAnimation : ObjectAnimator?
+            var btnScaleAnimation : ObjectAnimator? = null
 
             if (imgMap.scaleX == 1f && imgMap.scaleY == 1f) {
                 var BaseScale = TypedValue()
@@ -81,12 +83,20 @@ class MapActivity : AppCompatActivity(), GestureDetector.OnGestureListener, Gest
                 val pvhX = PropertyValuesHolder.ofFloat(View.SCALE_X, imgMap.scaleX, BaseScale.float)
                 val pvhY = PropertyValuesHolder.ofFloat(View.SCALE_Y, imgMap.scaleY, BaseScale.float)
 
-                val point = ZoomIn(p0!!.x, p0.y, BaseScale)
+                val point = zoomIn(p0!!.x, p0.y, BaseScale.float)
                 if (point != null) {
                     val trX = PropertyValuesHolder.ofFloat(View.TRANSLATION_X, imgMap.translationX, point.x)
                     val trY = PropertyValuesHolder.ofFloat(View.TRANSLATION_Y, imgMap.translationY, point.y)
 
                     scaleAnimation = ObjectAnimator.ofPropertyValuesHolder(imgMap, pvhX, pvhY, trX, trY)
+
+
+                    val pointCentral = obtenirPointCentral(BaseScale.float, BaseScale.float, point.x, point.y)
+
+                    val btnTrX = PropertyValuesHolder.ofFloat(View.TRANSLATION_X, btnPosition.translationX, (positionJoueur.x - pointCentral.x) * BaseScale.float)
+                    val btnTrY = PropertyValuesHolder.ofFloat(View.TRANSLATION_Y, btnPosition.translationY, (positionJoueur.y - pointCentral.y) * BaseScale.float)
+
+                    btnScaleAnimation = ObjectAnimator.ofPropertyValuesHolder(btnPosition, btnTrX, btnTrY)
                 } else {
                     scaleAnimation = null
                 }
@@ -98,10 +108,23 @@ class MapActivity : AppCompatActivity(), GestureDetector.OnGestureListener, Gest
                 val trY = PropertyValuesHolder.ofFloat(View.TRANSLATION_Y, imgMap.translationY, 0f)
 
                 scaleAnimation = ObjectAnimator.ofPropertyValuesHolder(imgMap, pvhX, pvhY, trX, trY)
+
+
+                val pointCentral = obtenirPointCentral(1f, 1f, 0f, 0f)
+
+                val btnTrX = PropertyValuesHolder.ofFloat(View.TRANSLATION_X, btnPosition.translationX, (positionJoueur.x - pointCentral.x))
+                val btnTrY = PropertyValuesHolder.ofFloat(View.TRANSLATION_Y, btnPosition.translationY, (positionJoueur.y - pointCentral.y))
+
+                btnScaleAnimation = ObjectAnimator.ofPropertyValuesHolder(btnPosition, btnTrX, btnTrY)
             }
 
             setAnimation = AnimatorSet()
             setAnimation.play(scaleAnimation)
+            setAnimation.duration = 1000
+            setAnimation.start()
+
+            setAnimation = AnimatorSet()
+            setAnimation.play(btnScaleAnimation)
             setAnimation.duration = 1000
             setAnimation.start()
         }
@@ -136,6 +159,12 @@ class MapActivity : AppCompatActivity(), GestureDetector.OnGestureListener, Gest
                         imgMap.translationY += scrollY
                         y1 = newY
                     }
+
+                    val pointCentral = obtenirPointCentral(imgMap.scaleX, imgMap.scaleY, imgMap.translationX, imgMap.translationY)
+                    btnPosition.translationX = (positionJoueur.x - pointCentral.x) * imgMap.scaleX
+                    btnPosition.translationY = (positionJoueur.y - pointCentral.y) * imgMap.scaleY
+
+                    Log.d("Position", pointCentral.toString())
                 }
                 else {
                     ScaleDetector!!.onTouchEvent(event)
@@ -150,7 +179,7 @@ class MapActivity : AppCompatActivity(), GestureDetector.OnGestureListener, Gest
         return super.onTouchEvent(event)
     }
 
-    private fun ZoomIn(x : Float, y : Float, baseScale : TypedValue) : PointF? {
+    private fun zoomIn(x : Float, y : Float, baseScale : Float) : PointF? {
         val posView = IntArray(2)
         imgMap.getLocationOnScreen(posView)
 
@@ -160,19 +189,19 @@ class MapActivity : AppCompatActivity(), GestureDetector.OnGestureListener, Gest
         val posX = x - (posView[0] + matrix[Matrix.MTRANS_X])
         val posY = y - (posView[1] + matrix[Matrix.MTRANS_Y])
 
-        val tailleMap = ObtenirTailleMap()
+        val tailleMap = obtenirTailleMap()
 
         if (posX >= 0
             && posY >= 0
             && posX <= tailleMap.x
             && posY <= tailleMap.y)
-            return PointF(((tailleMap.x / 2) * baseScale.float) - (posX * baseScale.float)
-                            , ((tailleMap.y / 2) * baseScale.float) - (posY * baseScale.float))
+            return PointF(((tailleMap.x / 2) * baseScale) - (posX * baseScale)
+                            , ((tailleMap.y / 2) * baseScale) - (posY * baseScale))
         else
             return null
     }
 
-    private fun ObtenirTailleMap() : PointF {
+    private fun obtenirTailleMap() : PointF {
         val matrix = FloatArray(9)
         imgMap.imageMatrix.getValues(matrix)
 
@@ -182,9 +211,18 @@ class MapActivity : AppCompatActivity(), GestureDetector.OnGestureListener, Gest
         return PointF(widthMap, heightMap)
     }
 
+    private fun obtenirPointCentral(newScaleX : Float, newScaleY : Float, newTransX : Float, newTransY: Float) : PointF {
+        val debutAffichage = PointF(newTransX, newTransY)
+        val matrix = FloatArray(9)
+        imgMap.imageMatrix.getValues(matrix)
+
+        return PointF(imgMap.pivotX - matrix[Matrix.MTRANS_X] - (debutAffichage.x / newScaleX),
+                imgMap.pivotY - matrix[Matrix.MTRANS_Y] - (debutAffichage.y / newScaleY))
+    }
+
     private fun verifierTranslationValide(trans : Float, transHori : Boolean) : Boolean {
-        var curr = 0f
-        val tailleMap = ObtenirTailleMap()
+        var curr: Float
+        val tailleMap = obtenirTailleMap()
 
         if (transHori) {
             curr = imgMap.translationX
@@ -203,13 +241,23 @@ class MapActivity : AppCompatActivity(), GestureDetector.OnGestureListener, Gest
         override fun onScale(detector: ScaleGestureDetector?): Boolean {
             val scale = imgMap.scaleX * detector!!.scaleFactor
 
-            if (scale >= 1f) {
-                imgMap.scaleX = scale
-                imgMap.scaleY = scale
-            } else {
+            if (scale < 1) {
                 imgMap.scaleX = 1f
                 imgMap.scaleY = 1f
             }
+            else if (scale > 5) {
+                imgMap.scaleX = 5f
+                imgMap.scaleY = 5f
+            }
+            else {
+                imgMap.scaleX = scale
+                imgMap.scaleY = scale
+            }
+
+            val pointCentral = obtenirPointCentral(imgMap.scaleX, imgMap.scaleY, imgMap.translationX, imgMap.translationY)
+            btnPosition.translationX = (positionJoueur.x - pointCentral.x) * imgMap.scaleX
+            btnPosition.translationY = (positionJoueur.y - pointCentral.y) * imgMap.scaleY
+
             return true
         }
     }

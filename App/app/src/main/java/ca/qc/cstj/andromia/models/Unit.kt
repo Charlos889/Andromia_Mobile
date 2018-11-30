@@ -1,7 +1,10 @@
 package ca.qc.cstj.andromia.models
 
 import java.util.*
+import kotlinx.serialization.*
 
+
+@Serializable
 data class Unit(val name : String,
                 val life : Int,
                 val speed : Int,
@@ -11,4 +14,4 @@ data class Unit(val name : String,
                 val set : String,
                 val uuid : String,
                 val kernel : Runes,
-                val createdDate : Date) { }
+                val createdDate : Date)

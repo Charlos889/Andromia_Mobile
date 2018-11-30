@@ -1,4 +1,6 @@
 package ca.qc.cstj.andromia.models
+import kotlinx.serialization.*
 
-data class UnitRunes(private val weapons : List<Weapon>, private val abilities : List<Ability>) {
+@Serializable
+data class UnitRunes(val weapons : List<Weapon>, val abilities : List<Ability>) {
 }

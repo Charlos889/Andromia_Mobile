@@ -1,6 +1,7 @@
 package ca.qc.cstj.andromia.models
 
-import android.graphics.drawable.Drawable
+import kotlinx.serialization.*
 
-data class Weapon(private val name : String, private val image : Drawable) {
+@Serializable
+data class Weapon(val name : String) {
 }

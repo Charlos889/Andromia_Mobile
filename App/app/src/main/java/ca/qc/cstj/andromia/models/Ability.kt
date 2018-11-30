@@ -1,6 +1,8 @@
 package ca.qc.cstj.andromia.models
 
 import android.graphics.drawable.Drawable
+import kotlinx.serialization.*
 
-data class Ability(private val name : String, private val image : Drawable) {
+@Serializable
+data class Ability(val name : String) {
 }

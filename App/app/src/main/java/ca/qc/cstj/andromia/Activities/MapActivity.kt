@@ -22,10 +22,18 @@ import ca.qc.cstj.andromia.R
 import ca.qc.cstj.andromia.R.id.imgMap
 import kotlinx.android.synthetic.main.activity_map.*
 import kotlin.math.absoluteValue
+import android.util.DisplayMetrics
+import android.graphics.BitmapFactory
+import android.graphics.Bitmap
+
+
+
+
 
 class MapActivity : AppCompatActivity(), GestureDetector.OnGestureListener, GestureDetector.OnDoubleTapListener {
 
-    private val positionJoueur = PointF(359f, 416f)
+    private val positionJoueur = PointF(522f, 405f)
+    private var tailleImage = PointF()
     private var x1 : Float = 0f
     private var x2 : Float? = null
     private var y1 : Float = 0f
@@ -41,6 +49,13 @@ class MapActivity : AppCompatActivity(), GestureDetector.OnGestureListener, Gest
 
         gDetector?.setOnDoubleTapListener(this)
         ScaleDetector = ScaleGestureDetector(this, ScaleListener)
+
+        val optBitmap = BitmapFactory.Options()
+        optBitmap.inTargetDensity = DisplayMetrics.DENSITY_DEFAULT
+        val bmp = BitmapFactory.decodeResource(getResources(),
+                R.drawable.andromia, optBitmap)
+
+        tailleImage = PointF(bmp.width.toFloat(), bmp.height.toFloat())
     }
 
     override fun onShowPress(p0: MotionEvent?) {
@@ -163,8 +178,6 @@ class MapActivity : AppCompatActivity(), GestureDetector.OnGestureListener, Gest
                     val pointCentral = obtenirPointCentral(imgMap.scaleX, imgMap.scaleY, imgMap.translationX, imgMap.translationY)
                     btnPosition.translationX = (positionJoueur.x - pointCentral.x) * imgMap.scaleX
                     btnPosition.translationY = (positionJoueur.y - pointCentral.y) * imgMap.scaleY
-
-                    Log.d("Position", pointCentral.toString())
                 }
                 else {
                     ScaleDetector!!.onTouchEvent(event)
@@ -212,12 +225,11 @@ class MapActivity : AppCompatActivity(), GestureDetector.OnGestureListener, Gest
     }
 
     private fun obtenirPointCentral(newScaleX : Float, newScaleY : Float, newTransX : Float, newTransY: Float) : PointF {
-        val debutAffichage = PointF(newTransX, newTransY)
         val matrix = FloatArray(9)
         imgMap.imageMatrix.getValues(matrix)
 
-        return PointF(imgMap.pivotX - matrix[Matrix.MTRANS_X] - (debutAffichage.x / newScaleX),
-                imgMap.pivotY - matrix[Matrix.MTRANS_Y] - (debutAffichage.y / newScaleY))
+        return PointF(((imgMap.pivotX) - matrix[Matrix.MTRANS_X] - (newTransX / newScaleX)) * tailleImage.x / (imgMap.pivotX * 2 - matrix[Matrix.MTRANS_X] * 2),
+                ((imgMap.pivotY) - matrix[Matrix.MTRANS_Y] - (newTransY / newScaleY)) * tailleImage.y / (imgMap.pivotY * 2 - matrix[Matrix.MTRANS_Y] * 2))
     }
 
     private fun verifierTranslationValide(trans : Float, transHori : Boolean) : Boolean {

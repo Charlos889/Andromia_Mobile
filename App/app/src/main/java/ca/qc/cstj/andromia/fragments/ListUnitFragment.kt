@@ -9,6 +9,7 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import ca.qc.cstj.andromia.R
 import ca.qc.cstj.andromia.UNITS_URL
 import ca.qc.cstj.andromia.adapters.UnitRecyclerViewAdapter
@@ -32,7 +33,7 @@ class ListUnitFragment : Fragment() {
     private var columnCount = 1
 
     private var listener: OnListFragmentInteractionListener? = null
-    private var units : List<Unit> = listOf()
+    private var units : MutableList<Unit> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -60,21 +61,21 @@ class ListUnitFragment : Fragment() {
             Fuel.get(UNITS_URL).responseJson() { request, response, result ->
                         when(response.statusCode) {
                             200 -> {
-                               createUnitList(result.get())
+                                try {
+                                    var lstUnits: List<Unit>
+                                    val json : Json = result.get()
+                                    lstUnits = JSON.nonstrict.parse(Unit.serializer().list, json.content)
+                                    units = lstUnits.toMutableList()
+                                } catch(e : Exception)
+                                {
+                                    Toast.makeText(this.context, e.message, Toast.LENGTH_LONG).show()
+                                }
                             }
                         }
                     }
 
         }
         return view
-    }
-
-    private fun createUnitList(json: Json) {
-
-        units = JSON.parse(Unit.serializer().list, json.content)
-        /*for(i in 0 until tabUnits.length()) {
-
-        }*/
     }
 
     override fun onAttach(context: Context) {

@@ -1,10 +1,13 @@
 package ca.qc.cstj.andromia.adapters
 
+import android.app.Activity
+import android.support.v4.app.FragmentActivity
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import ca.qc.cstj.andromia.R
 
 
@@ -21,7 +24,8 @@ import com.squareup.picasso.Picasso
  */
 class UnitRecyclerViewAdapter(
         private val Values: List<Unit>,
-        private val Listener: OnListFragmentInteractionListener?)
+        private val Listener: OnListFragmentInteractionListener?,
+        private val activity : FragmentActivity?)
     : RecyclerView.Adapter<UnitRecyclerViewAdapter.ViewHolder>() {
 
     private val OnClickListener: View.OnClickListener
@@ -54,10 +58,12 @@ class UnitRecyclerViewAdapter(
     override fun getItemCount(): Int = Values.size
 
     inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
-        val imgView: ImageView = view.imgUnit
+        val imgUnit: ImageView = view.imgUnit
+        val txtNom : TextView = view.txtNomUnit
 
         fun bind(unit : Unit) {
-            Picasso.with(view.context).load(unit.imageURL).into(imgView)
+            Picasso.with(view.context).load(unit.imageURL).into(imgUnit)
+            txtNom.text = unit.name
         }
     }
 }

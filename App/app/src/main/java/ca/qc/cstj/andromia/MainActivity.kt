@@ -1,23 +1,29 @@
 package ca.qc.cstj.andromia
 
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.util.Log
+import ca.qc.cstj.andromia.activities.ScanActivity
+import ca.qc.cstj.andromia.fragments.DetailsUnitFragment
 import ca.qc.cstj.andromia.fragments.ListUnitFragment
 import ca.qc.cstj.andromia.models.Unit
 
 
 class MainActivity : AppCompatActivity(), ListUnitFragment.OnListFragmentInteractionListener {
-    override fun onListFragmentInteraction(item: Unit?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    override fun onListFragmentInteraction(unit: Unit?) {
+        changeFragment(DetailsUnitFragment.newInstance(unit))
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        changeFragment(ListUnitFragment.newInstance(1), false)
+        /*val intent = Intent(this,ScanActivity::class.java)
+        startActivity(intent)*/
+
+        changeFragment(ListUnitFragment.newInstance(2), false)
 
     }
 

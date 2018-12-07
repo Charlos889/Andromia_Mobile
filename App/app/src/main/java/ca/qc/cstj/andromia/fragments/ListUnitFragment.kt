@@ -29,7 +29,6 @@ import kotlinx.serialization.json.jsonArray
  */
 class ListUnitFragment : Fragment() {
 
-    // TODO: Customize parameters
     private var columnCount = 1
 
     private var listener: OnListFragmentInteractionListener? = null
@@ -54,7 +53,7 @@ class ListUnitFragment : Fragment() {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
-                //adapter = UnitRecyclerViewAdapter(units, listener)
+                adapter = UnitRecyclerViewAdapter(units, listener, activity)
             }
 
             Fuel.get(UNITS_URL).responseJson() { _, response, result ->
@@ -63,8 +62,13 @@ class ListUnitFragment : Fragment() {
                         var lstUnits: List<Unit>
                         val json: Json = result.get()
                         lstUnits = JSON.nonstrict.parse(Unit.serializer().list, json.content)
-                        units = lstUnits.toMutableList()
-                        view.adapter = UnitRecyclerViewAdapter(units, listener)
+
+                        units.clear()
+                        units.addAll(lstUnits.toMutableList())
+                        view.adapter.notifyDataSetChanged()
+                    }
+                    else -> {
+                        Toast.makeText(activity,"Le serveur est présentement inaccessible..",Toast.LENGTH_LONG).show()
                     }
                 }
             }
@@ -99,8 +103,7 @@ class ListUnitFragment : Fragment() {
      * for more information.
      */
     interface OnListFragmentInteractionListener {
-        // TODO: Update argument type and name
-        fun onListFragmentInteraction(item: Unit?)
+        fun onListFragmentInteraction(unit: Unit?)
     }
 
     companion object {

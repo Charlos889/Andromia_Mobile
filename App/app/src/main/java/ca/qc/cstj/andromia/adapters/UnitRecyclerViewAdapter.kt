@@ -5,13 +5,12 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import android.widget.TextView
 import ca.qc.cstj.andromia.R
 
 
 import ca.qc.cstj.andromia.fragments.ListUnitFragment.OnListFragmentInteractionListener
 
-import kotlinx.android.synthetic.main.fragment_unit.view.*
+import kotlinx.android.synthetic.main.card_unit.view.*
 import ca.qc.cstj.andromia.models.Unit
 import com.squareup.picasso.Picasso
 
@@ -38,7 +37,7 @@ class UnitRecyclerViewAdapter(
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.fragment_unit, parent, false)
+                .inflate(R.layout.card_unit, parent, false)
         return ViewHolder(view)
     }
 
@@ -46,20 +45,19 @@ class UnitRecyclerViewAdapter(
         val item = Values[position]
 
         with(holder) {
-            View.tag = item
-            View.setOnClickListener(OnClickListener)
+            view.tag = item
+            view.setOnClickListener(OnClickListener)
             bind(item)
         }
     }
 
     override fun getItemCount(): Int = Values.size
 
-    inner class ViewHolder(val View: View) : RecyclerView.ViewHolder(View) {
-        val imgView: ImageView = View.imgUnit
+    inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+        val imgView: ImageView = view.imgUnit
 
-        fun bind(unit : Unit)
-        {
-            Picasso.with(imgView.context).load(unit.imageURL).into(imgView)
+        fun bind(unit : Unit) {
+            Picasso.with(view.context).load(unit.imageURL).into(imgView)
         }
     }
 }

@@ -54,27 +54,22 @@ class ListUnitFragment : Fragment() {
                     columnCount <= 1 -> LinearLayoutManager(context)
                     else -> GridLayoutManager(context, columnCount)
                 }
-                adapter = UnitRecyclerViewAdapter(units, listener)
+                //adapter = UnitRecyclerViewAdapter(units, listener)
             }
 
-
-            Fuel.get(UNITS_URL).responseJson() { request, response, result ->
-                        when(response.statusCode) {
-                            200 -> {
-                                try {
-                                    var lstUnits: List<Unit>
-                                    val json : Json = result.get()
-                                    lstUnits = JSON.nonstrict.parse(Unit.serializer().list, json.content)
-                                    units = lstUnits.toMutableList()
-                                } catch(e : Exception)
-                                {
-                                    Toast.makeText(this.context, e.message, Toast.LENGTH_LONG).show()
-                                }
-                            }
-                        }
+            Fuel.get(UNITS_URL).responseJson() { _, response, result ->
+                when (response.statusCode) {
+                    200 -> {
+                        var lstUnits: List<Unit>
+                        val json: Json = result.get()
+                        lstUnits = JSON.nonstrict.parse(Unit.serializer().list, json.content)
+                        units = lstUnits.toMutableList()
+                        view.adapter = UnitRecyclerViewAdapter(units, listener)
                     }
-
+                }
+            }
         }
+
         return view
     }
 

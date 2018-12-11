@@ -14,5 +14,5 @@ data class Unit(val name : String,
                 val runes : UnitRunes,
                 val set : String,
                 val uuid : String,
-                val kernel : Runes,
+                val kernel : List<Rune>,
                 val createdDate : String)

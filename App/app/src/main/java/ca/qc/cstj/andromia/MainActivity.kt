@@ -1,15 +1,22 @@
 package ca.qc.cstj.andromia
 
-import android.net.Uri
+import android.app.Activity
+import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.util.Log
 import ca.qc.cstj.andromia.Fragments.LoginFragment
-import ca.qc.cstj.andromia.Fragments.LoginFragment.OnFragmentInteractionListener
-import kotlinx.android.synthetic.main.activity_map.*
+import ca.qc.cstj.andromia.fragments.DetailsUnitFragment
+import ca.qc.cstj.andromia.fragments.ListUnitFragment
+import ca.qc.cstj.andromia.models.Unit
 
-class MainActivity : AppCompatActivity(), LoginFragment.OnFragmentInteractionListener {
+
+class MainActivity : AppCompatActivity(), ListUnitFragment.OnListFragmentInteractionListener, LoginFragment.OnFragmentInteractionListener {
+    override fun onListFragmentInteraction(unit: Unit?) {
+        changeFragment(DetailsUnitFragment.newInstance(unit))
+    }
+
     override fun onLoginFragmentInteraction() {
 
     }
@@ -18,7 +25,11 @@ class MainActivity : AppCompatActivity(), LoginFragment.OnFragmentInteractionLis
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        changeFragment(LoginFragment.newInstance(), true)
+        /*val intent = Intent(this,ScanActivity::class.java)
+        startActivity(intent)*/
+
+        changeFragment(ListUnitFragment.newInstance(2), true, true)
+
     }
 
     private fun changeFragment(newFragment : Fragment, saveInBackstack : Boolean = true, animate:Boolean = true, tag:String = newFragment.javaClass.name) {
@@ -42,4 +53,7 @@ class MainActivity : AppCompatActivity(), LoginFragment.OnFragmentInteractionLis
             Log.e("MonErreur",e.toString())
         }
     }
+
+
+
 }

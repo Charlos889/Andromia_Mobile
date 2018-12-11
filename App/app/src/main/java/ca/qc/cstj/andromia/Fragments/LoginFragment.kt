@@ -10,6 +10,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import ca.qc.cstj.andromia.EXPLORERS_URL
 
 import ca.qc.cstj.andromia.R
 import kotlinx.android.synthetic.main.fragment_login.*
@@ -35,6 +36,10 @@ class LoginFragment : Fragment() {
     private var listener: OnFragmentInteractionListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        val path = EXPLORERS_URL
+
+
+
         super.onCreate(savedInstanceState)
     }
 
@@ -51,11 +56,7 @@ class LoginFragment : Fragment() {
             val username = edtUsername.text.toString()
             val password = edtPassword.text.toString()
 
-            val preferencesEdit = preferences.edit()
-
-            preferencesEdit.putString("username", username)
-            preferencesEdit.putString("password", password)
-            preferencesEdit.commit()
+            listener!!.onLoginFragmentInteraction(username, password)
         }
 
         super.onStart()
@@ -88,7 +89,7 @@ class LoginFragment : Fragment() {
      */
     interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        fun onLoginFragmentInteraction()
+        fun onLoginFragmentInteraction(username: String, password: String)
     }
 
     companion object {

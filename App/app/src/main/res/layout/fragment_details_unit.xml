@@ -8,8 +8,8 @@
 
     <ImageView
         android:id="@+id/imgDetailUnit"
-        android:layout_width="150dp"
-        android:layout_height="150dp"
+        android:layout_width="175dp"
+        android:layout_height="175dp"
         />
 
     <TextView
@@ -20,5 +20,14 @@
         android:textSize="20sp"
         android:gravity="center"
         app:layout_constraintTop_toBottomOf="@+id/imgDetailUnit" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/rcvKernel"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        >
+
+    </android.support.v7.widget.RecyclerView>
 
 </android.support.constraint.ConstraintLayout>

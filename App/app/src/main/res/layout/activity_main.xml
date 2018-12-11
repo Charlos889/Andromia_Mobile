@@ -10,8 +10,6 @@
         android:id="@+id/contentFrame"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginTop="10dp">
-s
-    </FrameLayout>
+        android:layout_marginTop="10dp"/>
 
 </android.support.constraint.ConstraintLayout>

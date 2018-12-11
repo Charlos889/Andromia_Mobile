@@ -6,17 +6,19 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.util.Log
-import android.widget.Toast
+import ca.qc.cstj.andromia.Fragments.LoginFragment
 import ca.qc.cstj.andromia.fragments.DetailsUnitFragment
 import ca.qc.cstj.andromia.fragments.ListUnitFragment
-import ca.qc.cstj.andromia.fragments.ScanFragment
 import ca.qc.cstj.andromia.models.Unit
-import com.google.zxing.integration.android.IntentIntegrator
 
 
-class MainActivity : AppCompatActivity(), ListUnitFragment.OnListFragmentInteractionListener {
+class MainActivity : AppCompatActivity(), ListUnitFragment.OnListFragmentInteractionListener, LoginFragment.OnFragmentInteractionListener {
     override fun onListFragmentInteraction(unit: Unit?) {
         changeFragment(DetailsUnitFragment.newInstance(unit))
+    }
+
+    override fun onLoginFragmentInteraction() {
+
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {

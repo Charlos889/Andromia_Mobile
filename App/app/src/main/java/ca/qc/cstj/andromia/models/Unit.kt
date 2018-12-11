@@ -1,9 +1,8 @@
 package ca.qc.cstj.andromia.models
 
+import ca.qc.cstj.andromia.serializers.DateSerializer
 import java.util.*
 import kotlinx.serialization.*
-import java.time.LocalDateTime
-
 
 @Serializable
 data class Unit(val name : String,
@@ -14,5 +13,7 @@ data class Unit(val name : String,
                 val runes : UnitRunes,
                 val set : String,
                 val uuid : String,
-                val kernel : List<Rune>,
-                val createdDate : String)
+                val kernel : Runes,
+                @Serializable(with = DateSerializer::class) val createdDate : Date) {}
+
+

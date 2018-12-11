@@ -10,16 +10,16 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import ca.qc.cstj.andromia.EXPLORERS_URL
 import ca.qc.cstj.andromia.R
-import ca.qc.cstj.andromia.UNITS_URL
 import ca.qc.cstj.andromia.adapters.UnitRecyclerViewAdapter
 import ca.qc.cstj.andromia.models.Unit
 import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.android.core.Json
 import com.github.kittinunf.fuel.android.extension.responseJson
+import com.github.kittinunf.fuel.httpGet
 import kotlinx.serialization.json.JSON
 import kotlinx.serialization.list
-import kotlinx.serialization.json.jsonArray
 
 
 /**
@@ -56,7 +56,9 @@ class ListUnitFragment : Fragment() {
                 adapter = UnitRecyclerViewAdapter(units, listener, activity)
             }
 
-            Fuel.get(UNITS_URL).responseJson() { _, response, result ->
+            val userToken : String = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkxhdXJlbmNlIiwiaWF0IjoxNTQ0ODE0Mjk1fQ.n2oIkUKeSFUbozZYrN7YCITzopk-F_OyIn-SdROyOrI"
+            val path : String = "$EXPLORERS_URL Laurence/units"
+            path.httpGet().header(mapOf("Authorization" to "Bearer $userToken")).responseJson() { _, response, result ->
                 when (response.statusCode) {
                     200 -> {
                         var lstUnits: List<Unit>

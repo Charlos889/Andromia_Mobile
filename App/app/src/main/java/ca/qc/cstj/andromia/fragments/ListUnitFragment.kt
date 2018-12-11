@@ -56,23 +56,29 @@ class ListUnitFragment : Fragment() {
                 adapter = UnitRecyclerViewAdapter(units, listener, activity)
             }
 
-            val userToken : String = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkxhdXJlbmNlIiwiaWF0IjoxNTQ0ODE0Mjk1fQ.n2oIkUKeSFUbozZYrN7YCITzopk-F_OyIn-SdROyOrI"
-            val path : String = "$EXPLORERS_URL Laurence/units"
-            path.httpGet().header(mapOf("Authorization" to "Bearer $userToken")).responseJson() { _, response, result ->
-                when (response.statusCode) {
-                    200 -> {
-                        var lstUnits: List<Unit>
-                        val json: Json = result.get()
-                        lstUnits = JSON.nonstrict.parse(Unit.serializer().list, json.content)
+            val userToken : String = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkNsw6ltZW50IiwiaWF0IjoxNTQ1MTQ2OTI4fQ.TtfAqbuG__BHxDTKu8vyQhjGCqzQIvCnlP_A5K1XhNY"
+            val path : String = "$EXPLORERS_URL/Clement/units"
+            try {
+                path.httpGet().header(mapOf("Authorization" to "Bearer $userToken")).responseJson() { _, response, result ->
+                    when (response.statusCode) {
+                        200 -> {
+                            var lstUnits: List<Unit>
+                            val json = result.get()
+                            val items = json.obj().get("items")
+                            lstUnits = JSON.nonstrict.parse(Unit.serializer().list, items.toString())
 
-                        units.clear()
-                        units.addAll(lstUnits.toMutableList())
-                        view.adapter.notifyDataSetChanged()
-                    }
-                    else -> {
-                        Toast.makeText(activity,"Le serveur est présentement inaccessible..",Toast.LENGTH_LONG).show()
+                            units.clear()
+                            units.addAll(lstUnits.toMutableList())
+                            view.adapter.notifyDataSetChanged()
+                        }
+                        else -> {
+                            Toast.makeText(activity, "Le serveur est présentement inaccessible..", Toast.LENGTH_LONG).show()
+                        }
                     }
                 }
+            } catch (e : Exception)
+            {
+                Toast.makeText(activity, e.message, Toast.LENGTH_LONG).show()
             }
         }
 

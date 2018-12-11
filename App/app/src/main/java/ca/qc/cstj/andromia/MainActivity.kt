@@ -1,14 +1,17 @@
 package ca.qc.cstj.andromia
 
+import android.app.Activity
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.util.Log
-import ca.qc.cstj.andromia.activities.ScanActivity
+import android.widget.Toast
 import ca.qc.cstj.andromia.fragments.DetailsUnitFragment
 import ca.qc.cstj.andromia.fragments.ListUnitFragment
+import ca.qc.cstj.andromia.fragments.ScanFragment
 import ca.qc.cstj.andromia.models.Unit
+import com.google.zxing.integration.android.IntentIntegrator
 
 
 class MainActivity : AppCompatActivity(), ListUnitFragment.OnListFragmentInteractionListener {
@@ -23,7 +26,7 @@ class MainActivity : AppCompatActivity(), ListUnitFragment.OnListFragmentInterac
         /*val intent = Intent(this,ScanActivity::class.java)
         startActivity(intent)*/
 
-        changeFragment(ListUnitFragment.newInstance(2), false)
+        changeFragment(ListUnitFragment.newInstance(2), true, true)
 
     }
 
@@ -48,5 +51,7 @@ class MainActivity : AppCompatActivity(), ListUnitFragment.OnListFragmentInterac
             Log.e("MonErreur",e.toString())
         }
     }
+
+
 
 }

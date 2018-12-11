@@ -20,7 +20,6 @@
             </intent-filter>
         </activity>
         <activity android:name=".activities.ScanActivity" />
-        <activity android:name=".activities.UnitsActivity"></activity>
         <activity android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
             tools:replace="android:screenOrientation"

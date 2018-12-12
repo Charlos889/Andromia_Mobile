@@ -62,6 +62,8 @@ class MapFragment : Fragment(), GestureDetector.OnGestureListener, GestureDetect
                 }
 
         super.onCreate(savedInstanceState)
+
+        setHasOptionsMenu(true)
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -102,6 +104,11 @@ class MapFragment : Fragment(), GestureDetector.OnGestureListener, GestureDetect
         }
 
         return view
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?, menuInflater: MenuInflater) {
+        menuInflater.inflate(R.menu.menu_connecte, menu)
+        super.onCreateOptionsMenu(menu, menuInflater)
     }
 
     override fun onStart() {
@@ -361,9 +368,6 @@ class MapFragment : Fragment(), GestureDetector.OnGestureListener, GestureDetect
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance() =
-                MapFragment().apply {
-
-                }
+        fun newInstance() = MapFragment()
     }
 }

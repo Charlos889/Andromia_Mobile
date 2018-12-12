@@ -13,7 +13,10 @@ import android.widget.TextView
 import ca.qc.cstj.andromia.EXPLORERS_URL
 
 import ca.qc.cstj.andromia.R
+import com.github.kittinunf.fuel.android.extension.responseJson
+import com.github.kittinunf.fuel.httpPost
 import kotlinx.android.synthetic.main.fragment_login.*
+import org.json.JSONObject
 
 // TODO: Rename parameter arguments, choose names that match
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -35,14 +38,6 @@ class LoginFragment : Fragment() {
 
     private var listener: OnFragmentInteractionListener? = null
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        val path = EXPLORERS_URL
-
-
-
-        super.onCreate(savedInstanceState)
-    }
-
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
@@ -50,13 +45,35 @@ class LoginFragment : Fragment() {
     }
 
     override fun onStart() {
-        val preferences = this.activity!!.getSharedPreferences("Andromia", Context.MODE_PRIVATE)
-
         btnLogin.setOnClickListener {
             val username = edtUsername.text.toString()
             val password = edtPassword.text.toString()
 
-            listener!!.onLoginFragmentInteraction(username, password)
+            val path = "$EXPLORERS_URL/login"
+
+            // Formation de l'objet de l'utilisateur
+            val json = JSONObject()
+            json.put("username", username)
+            json.put("password", password)
+
+            path.httpPost().body(json.toString()).header(mapOf("Content-Type" to "application/json")).responseJson { request, response, result ->
+                when (response.statusCode) {
+                    200 -> {
+                        // Sauvegarder les infos dans les SharedPreferences
+                        val jsonResult = result.get()
+                        val preferences = activity!!.getSharedPreferences("Andromia", Context.MODE_PRIVATE).edit()
+
+                        preferences.putString("token", jsonResult.obj().get("token").toString())
+                        // Le commit est utile pour conserver l'information des SharedPreferences en cas d'app crash (autrement, avec apply, on les perdait)
+                        preferences.commit()
+                        listener!!.onLoginFragmentInteraction()
+                    }
+                    // TODO : Implémenter les codes d'erreur
+                    else -> {
+                        Log.e("Error", response.toString())
+                    }
+                }
+            }
         }
 
         super.onStart()
@@ -89,7 +106,7 @@ class LoginFragment : Fragment() {
      */
     interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        fun onLoginFragmentInteraction(username: String, password: String)
+        fun onLoginFragmentInteraction()
     }
 
     companion object {
@@ -103,9 +120,6 @@ class LoginFragment : Fragment() {
          */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance() =
-                LoginFragment().apply {
-
-                }
+        fun newInstance() = LoginFragment()
     }
 }

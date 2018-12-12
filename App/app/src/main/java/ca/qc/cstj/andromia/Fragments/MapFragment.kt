@@ -57,6 +57,8 @@ class MapFragment : Fragment(), GestureDetector.OnGestureListener, GestureDetect
 
                                 positionnerBouton()
                             }
+
+                            listener!!.utilisateurCharge(explorerObj!!)
                         }
                     }
                 }
@@ -91,8 +93,7 @@ class MapFragment : Fragment(), GestureDetector.OnGestureListener, GestureDetect
                         }
 
                         positionnerBouton()
-                    }
-                    else {
+                    } else {
                         ScaleDetector!!.onTouchEvent(event)
                     }
                 }
@@ -107,7 +108,6 @@ class MapFragment : Fragment(), GestureDetector.OnGestureListener, GestureDetect
     }
 
     override fun onCreateOptionsMenu(menu: Menu?, menuInflater: MenuInflater) {
-        menuInflater.inflate(R.menu.menu_connecte, menu)
         super.onCreateOptionsMenu(menu, menuInflater)
     }
 
@@ -341,31 +341,13 @@ class MapFragment : Fragment(), GestureDetector.OnGestureListener, GestureDetect
         return true
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     *
-     *
-     * See the Android Training lesson [Communicating with Other Fragments]
-     * (http://developer.android.com/training/basics/fragments/communicating.html)
-     * for more information.
-     */
+
     interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
-        fun onMapFragmentInteraction()
+        fun utilisateurCharge(utilisateur: Explorer)
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment MapFragment.
-         */
         // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance() = MapFragment()

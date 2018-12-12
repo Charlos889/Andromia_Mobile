@@ -2,7 +2,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
-        android:id="@+id/btnTest"
+        android:id="@+id/btnLogout"
         android:icon="@drawable/andromia"
         android:title="Edit"
         app:showAsAction="always"/>

@@ -20,6 +20,7 @@ android:id="@+id/ctlMap">
     android:layout_width="15dp"
     android:layout_height="15dp"
     android:layout_centerInParent="true"
-    android:background="@drawable/point_position"/>
+    android:background="@drawable/point_position"
+    android:clickable="false"/>
 
 </RelativeLayout>

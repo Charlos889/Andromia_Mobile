@@ -1,35 +1,114 @@
 package ca.qc.cstj.andromia
 
-import android.app.Activity
-import android.content.Intent
+import android.content.Context
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.constraint.ConstraintLayout
 import android.support.v4.app.Fragment
 import android.util.Log
+import android.view.Menu
+import android.view.MenuItem
 import ca.qc.cstj.andromia.Fragments.LoginFragment
+import ca.qc.cstj.andromia.Fragments.MapFragment
 import ca.qc.cstj.andromia.fragments.DetailsUnitFragment
 import ca.qc.cstj.andromia.fragments.ListUnitFragment
+import ca.qc.cstj.andromia.models.Explorer
 import ca.qc.cstj.andromia.models.Unit
+import kotlinx.android.synthetic.main.activity_main.*
 
 
-class MainActivity : AppCompatActivity(), ListUnitFragment.OnListFragmentInteractionListener, LoginFragment.OnFragmentInteractionListener {
+class MainActivity : AppCompatActivity()
+        , ListUnitFragment.OnListFragmentInteractionListener
+        , LoginFragment.OnFragmentInteractionListener
+        , MapFragment.OnFragmentInteractionListener {
+
+    private var explorer : Explorer? = null
+    private var menuOuvert = false
+
     override fun onListFragmentInteraction(unit: Unit?) {
+        modifierAffichageMenu(true, explorer!!.username, afficherBoutonRetour = true)
         changeFragment(DetailsUnitFragment.newInstance(unit))
     }
 
     override fun onLoginFragmentInteraction() {
+        changeFragment(MapFragment.newInstance(), false)
+    }
 
+    override fun utilisateurCharge(utilisateur: Explorer) {
+        explorer = utilisateur
+        modifierAffichageMenu(true, utilisateur.username)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
-        /*val intent = Intent(this,ScanActivity::class.java)
-        startActivity(intent)*/
+        val preferences = getSharedPreferences("Andromia", Context.MODE_PRIVATE)
+        val token = preferences.getString("token", "")
 
-        changeFragment(ListUnitFragment.newInstance(2), true, true)
+        // Si l'utilisateur est déjà connecté, on l'emmène directement à la Map (utile dans les cas d'app crash/force close)
+        if (token == "") {
+            modifierAffichageMenu(false)
+            changeFragment(LoginFragment.newInstance(), false)
+        } else {
+            changeFragment(MapFragment.newInstance(), false)
+        }
 
+        // Apparemment les FrameLayout ne prennent pas leur taille du XML, il faut les set manuellement
+        contentFrame.layoutParams = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT)
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        if (menu != null) {
+            menuInflater.inflate(R.menu.menu_andromia, menu)
+
+            if (!menuOuvert) {
+                for (i in 0 until menu.size()) {
+                    menu.getItem(i).isVisible = menuOuvert
+                }
+            }
+        }
+
+        return super.onCreateOptionsMenu(menu)
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        return when (item!!.itemId) {
+            R.id.btnLogout -> {
+                val preferences = getSharedPreferences("Andromia", Context.MODE_PRIVATE).edit()
+
+                preferences.putString("token", "")
+                preferences.commit()
+
+                modifierAffichageMenu(false)
+                changeFragment(LoginFragment.newInstance(), false)
+
+                true
+            }
+            R.id.btnMenuUnits -> {
+                changeFragment(ListUnitFragment.newInstance(2))
+                modifierAffichageMenu(true, explorer!!.username, true)
+
+                true
+            }
+            else -> {
+                super.onOptionsItemSelected(item)
+            }
+        }
+    }
+
+    override fun onSupportNavigateUp(): Boolean {
+        supportFragmentManager.popBackStackImmediate()
+
+        val fragment = supportFragmentManager.findFragmentById(R.id.contentFrame)
+
+        when (fragment) {
+            is MapFragment -> {
+                supportActionBar!!.setDisplayHomeAsUpEnabled(false)
+            }
+        }
+
+        return super.onSupportNavigateUp()
     }
 
     private fun changeFragment(newFragment : Fragment, saveInBackstack : Boolean = true, animate:Boolean = true, tag:String = newFragment.javaClass.name) {
@@ -54,6 +133,11 @@ class MainActivity : AppCompatActivity(), ListUnitFragment.OnListFragmentInterac
         }
     }
 
+    private fun modifierAffichageMenu(afficherMenu : Boolean, titre: String = "Andromia", afficherBoutonRetour: Boolean = false) {
+        menuOuvert = afficherMenu
+        invalidateOptionsMenu()
 
-
+        supportActionBar!!.title = titre
+        supportActionBar!!.setDisplayHomeAsUpEnabled(afficherBoutonRetour)
+    }
 }

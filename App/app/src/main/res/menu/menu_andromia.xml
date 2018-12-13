@@ -2,9 +2,14 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <item
+        android:id="@+id/btnMenuUnits"
+        android:title="Units"
+        android:icon="@drawable/unit"
+        app:showAsAction="ifRoom"/>
+
+    <item
         android:id="@+id/btnLogout"
-        android:icon="@drawable/andromia"
-        android:title="Edit"
-        app:showAsAction="always"/>
+        android:title="Logout"
+        app:showAsAction="never"/>
 
 </menu>

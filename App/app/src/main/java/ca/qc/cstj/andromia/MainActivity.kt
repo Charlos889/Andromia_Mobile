@@ -26,18 +26,17 @@ class MainActivity : AppCompatActivity()
     private var menuOuvert = false
 
     override fun onListFragmentInteraction(unit: Unit?) {
+        modifierAffichageMenu(true, explorer!!.username, afficherBoutonRetour = true)
         changeFragment(DetailsUnitFragment.newInstance(unit))
     }
 
     override fun onLoginFragmentInteraction() {
-        supportFragmentManager.popBackStack()
         changeFragment(MapFragment.newInstance(), false)
-        modifierAffichageMenu(true)
     }
 
     override fun utilisateurCharge(utilisateur: Explorer) {
         explorer = utilisateur
-        supportActionBar!!.title = utilisateur.username
+        modifierAffichageMenu(true, utilisateur.username)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -52,7 +51,6 @@ class MainActivity : AppCompatActivity()
             modifierAffichageMenu(false)
             changeFragment(LoginFragment.newInstance(), false)
         } else {
-            modifierAffichageMenu(true)
             changeFragment(MapFragment.newInstance(), false)
         }
 
@@ -87,6 +85,12 @@ class MainActivity : AppCompatActivity()
 
                 true
             }
+            R.id.btnMenuUnits -> {
+                changeFragment(ListUnitFragment.newInstance(2))
+                modifierAffichageMenu(true, explorer!!.username, true)
+
+                true
+            }
             else -> {
                 super.onOptionsItemSelected(item)
             }
@@ -94,8 +98,16 @@ class MainActivity : AppCompatActivity()
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        supportActionBar!!.setDisplayHomeAsUpEnabled(false)
         supportFragmentManager.popBackStackImmediate()
+
+        val fragment = supportFragmentManager.findFragmentById(R.id.contentFrame)
+
+        when (fragment) {
+            is MapFragment -> {
+                supportActionBar!!.setDisplayHomeAsUpEnabled(false)
+            }
+        }
+
         return super.onSupportNavigateUp()
     }
 
@@ -121,10 +133,11 @@ class MainActivity : AppCompatActivity()
         }
     }
 
-    private fun modifierAffichageMenu(afficherMenu : Boolean, afficherBoutonRetour: Boolean = false) {
+    private fun modifierAffichageMenu(afficherMenu : Boolean, titre: String = "Andromia", afficherBoutonRetour: Boolean = false) {
         menuOuvert = afficherMenu
         invalidateOptionsMenu()
 
+        supportActionBar!!.title = titre
         supportActionBar!!.setDisplayHomeAsUpEnabled(afficherBoutonRetour)
     }
 }

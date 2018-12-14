@@ -1,9 +1,11 @@
-package ca.qc.cstj.andromia.Fragments
+package ca.qc.cstj.andromia.fragments
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
+import android.app.Activity
 import android.content.Context
+import android.content.Intent
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.graphics.PointF
@@ -11,16 +13,16 @@ import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v4.view.GestureDetectorCompat
 import android.util.DisplayMetrics
-import android.util.Log
 import android.util.TypedValue
 import android.view.*
+import android.widget.Toast
 import ca.qc.cstj.andromia.EXPLORERS_URL
 
 import ca.qc.cstj.andromia.R
 import ca.qc.cstj.andromia.models.Explorer
-import ca.qc.cstj.andromia.models.Unit
 import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.httpGet
+import com.google.zxing.integration.android.IntentIntegrator
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.serialization.json.JSON
 
@@ -107,10 +109,6 @@ class MapFragment : Fragment(), GestureDetector.OnGestureListener, GestureDetect
         return view
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?, menuInflater: MenuInflater) {
-        super.onCreateOptionsMenu(menu, menuInflater)
-    }
-
     override fun onStart() {
         gDetector = GestureDetectorCompat(this.context, this)
 
@@ -152,6 +150,14 @@ class MapFragment : Fragment(), GestureDetector.OnGestureListener, GestureDetect
                 positionnerBouton()
             }
         })
+
+        btnScan.setOnTouchListener { v, event ->
+
+            val scanner = IntentIntegrator.forSupportFragment(this)
+            scanner.initiateScan()
+
+            return@setOnTouchListener true
+        }
 
         super.onStart()
     }
@@ -274,6 +280,21 @@ class MapFragment : Fragment(), GestureDetector.OnGestureListener, GestureDetect
 
     override fun onSingleTapConfirmed(p0: MotionEvent?): Boolean {
         return true
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        if(resultCode == Activity.RESULT_OK) {
+            val result  = IntentIntegrator.parseActivityResult(requestCode, resultCode, data)
+            if(result != null) {
+                if(result.contents == null) {
+                    Toast.makeText(activity, "Cancelled", Toast.LENGTH_LONG).show()
+                } else {
+                    Toast.makeText(activity, "Scanned: "+ result.contents, Toast.LENGTH_LONG).show()
+                }
+            } else {
+                super.onActivityResult(requestCode, resultCode, data)
+            }
+        }
     }
 
     private fun zoomIn(x : Float, y : Float, baseScale : Float) : PointF? {

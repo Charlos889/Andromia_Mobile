@@ -1,20 +1,24 @@
 package ca.qc.cstj.andromia
 
 import android.content.Context
+import android.content.DialogInterface
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.support.constraint.ConstraintLayout
 import android.support.v4.app.Fragment
+import android.support.v4.app.FragmentManager
+import android.support.v4.view.GravityCompat
+import android.support.v4.widget.DrawerLayout
+import android.support.v7.app.AlertDialog
 import android.util.Log
-import android.view.Menu
 import android.view.MenuItem
-import ca.qc.cstj.andromia.Fragments.LoginFragment
-import ca.qc.cstj.andromia.Fragments.MapFragment
+import ca.qc.cstj.andromia.fragments.LoginFragment
+import ca.qc.cstj.andromia.fragments.MapFragment
 import ca.qc.cstj.andromia.fragments.DetailsUnitFragment
 import ca.qc.cstj.andromia.fragments.ListUnitFragment
 import ca.qc.cstj.andromia.models.Explorer
 import ca.qc.cstj.andromia.models.Unit
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.header_navigation.*
 
 
 class MainActivity : AppCompatActivity()
@@ -26,7 +30,7 @@ class MainActivity : AppCompatActivity()
     private var menuOuvert = false
 
     override fun onListFragmentInteraction(unit: Unit?) {
-        modifierAffichageMenu(true, explorer!!.username, afficherBoutonRetour = true)
+        modifierTitre(explorer!!.username)
         changeFragment(DetailsUnitFragment.newInstance(unit))
     }
 
@@ -36,75 +40,83 @@ class MainActivity : AppCompatActivity()
 
     override fun utilisateurCharge(utilisateur: Explorer) {
         explorer = utilisateur
-        modifierAffichageMenu(true, utilisateur.username)
+        modifierTitre(utilisateur.username)
+
+        txtNomExplorer.text = utilisateur.username
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+        setSupportActionBar(tlbMain)
+
+        ngvAndromia.setNavigationItemSelectedListener { menuItem ->
+            mainLayout.closeDrawer(GravityCompat.START)
+
+            when (menuItem.itemId) {
+                R.id.nvmHome -> {
+                    supportFragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+
+                    val fragment = supportFragmentManager.findFragmentById(R.id.contentFrame)
+
+                    modifierReturnButton(fragment)
+                    modifierMenuOptions(fragment)
+                    modifierTitre(explorer!!.username)
+                }
+                R.id.nvmUnits -> {
+                    changeFragment(ListUnitFragment.newInstance(2))
+                    modifierTitre(explorer!!.username)
+                }
+                R.id.nvmLogout -> {
+                    val preferences = getSharedPreferences("Andromia", Context.MODE_PRIVATE).edit()
+                    preferences.putString("token", "")
+                    preferences.putString("username", "")
+                    preferences.commit()
+
+                    supportFragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+                    modifierTitre("Andromia")
+                    changeFragment(LoginFragment.newInstance(), false)
+                }
+            }
+
+            true
+        }
+
         val preferences = getSharedPreferences("Andromia", Context.MODE_PRIVATE)
         val token = preferences.getString("token", "")
 
         // Si l'utilisateur est déjà connecté, on l'emmène directement à la Map (utile dans les cas d'app crash/force close)
         if (token == "") {
-            modifierAffichageMenu(false)
+            modifierTitre("Andromia")
             changeFragment(LoginFragment.newInstance(), false)
         } else {
             changeFragment(MapFragment.newInstance(), false)
         }
-
-        // Apparemment les FrameLayout ne prennent pas leur taille du XML, il faut les set manuellement
-        contentFrame.layoutParams = ConstraintLayout.LayoutParams(ConstraintLayout.LayoutParams.MATCH_PARENT, ConstraintLayout.LayoutParams.MATCH_PARENT)
     }
 
-    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
-        if (menu != null) {
-            menuInflater.inflate(R.menu.menu_andromia, menu)
-
-            if (!menuOuvert) {
-                for (i in 0 until menu.size()) {
-                    menu.getItem(i).isVisible = menuOuvert
-                }
-            }
-        }
-
-        return super.onCreateOptionsMenu(menu)
-    }
-
-    override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        return when (item!!.itemId) {
-            R.id.btnLogout -> {
-                val preferences = getSharedPreferences("Andromia", Context.MODE_PRIVATE).edit()
-
-                preferences.putString("token", "")
-                preferences.commit()
-
-                modifierAffichageMenu(false)
-                changeFragment(LoginFragment.newInstance(), false)
-
-                true
-            }
-            R.id.btnMenuUnits -> {
-                changeFragment(ListUnitFragment.newInstance(2))
-                modifierAffichageMenu(true, explorer!!.username, true)
-
-                true
-            }
-            else -> {
-                super.onOptionsItemSelected(item)
-            }
+    override fun onBackPressed() {
+        if (mainLayout.isDrawerOpen(GravityCompat.START)) {
+            mainLayout.closeDrawer(GravityCompat.START)
+        } else {
+            super.onBackPressed()
         }
     }
 
     override fun onSupportNavigateUp(): Boolean {
-        supportFragmentManager.popBackStackImmediate()
-
-        val fragment = supportFragmentManager.findFragmentById(R.id.contentFrame)
+        var fragment = supportFragmentManager.findFragmentById(R.id.contentFrame)
 
         when (fragment) {
             is MapFragment -> {
-                supportActionBar!!.setDisplayHomeAsUpEnabled(false)
+                mainLayout.openDrawer(GravityCompat.START)
+            }
+            else -> {
+                supportFragmentManager.popBackStackImmediate()
+
+                fragment = supportFragmentManager.findFragmentById(R.id.contentFrame)
+
+                modifierReturnButton(fragment)
+                modifierMenuOptions(fragment)
             }
         }
 
@@ -128,16 +140,56 @@ class MainActivity : AppCompatActivity()
                 }
                 transaction.commit()
             }
+
+            modifierReturnButton(newFragment)
+            modifierMenuOptions(newFragment)
+            modifierNavigationDrawer(newFragment)
         } catch (e:IllegalStateException) {
             Log.e("MonErreur",e.toString())
         }
     }
 
-    private fun modifierAffichageMenu(afficherMenu : Boolean, titre: String = "Andromia", afficherBoutonRetour: Boolean = false) {
-        menuOuvert = afficherMenu
-        invalidateOptionsMenu()
-
+    private fun modifierTitre(titre: String = "Andromia") {
         supportActionBar!!.title = titre
-        supportActionBar!!.setDisplayHomeAsUpEnabled(afficherBoutonRetour)
+    }
+
+    private fun modifierMenuOptions(fragmentActuel: Fragment) {
+        menuOuvert = when (fragmentActuel) {
+            is LoginFragment -> {
+                false
+            }
+            else -> {
+                true
+            }
+        }
+
+        invalidateOptionsMenu()
+    }
+
+    private fun modifierNavigationDrawer(fragmentActuel: Fragment) {
+        when (fragmentActuel) {
+            is LoginFragment -> {
+                mainLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
+            }
+            else -> {
+                mainLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
+            }
+        }
+    }
+
+    private fun modifierReturnButton(fragmentActuel: Fragment) {
+        when (fragmentActuel) {
+            is MapFragment -> {
+                supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+                supportActionBar!!.setHomeAsUpIndicator(R.drawable.ic_menu)
+            }
+            is LoginFragment -> {
+                supportActionBar!!.setDisplayHomeAsUpEnabled(false)
+            }
+            else -> {
+                supportActionBar!!.setDisplayHomeAsUpEnabled(true)
+                supportActionBar!!.setHomeAsUpIndicator(R.drawable.ic_arrow_back)
+            }
+        }
     }
 }

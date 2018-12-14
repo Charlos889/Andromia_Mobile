@@ -1,15 +1,12 @@
-package ca.qc.cstj.andromia.Fragments
+package ca.qc.cstj.andromia.fragments
 
 import android.content.Context
-import android.net.Uri
 import android.os.Bundle
-import android.preference.PreferenceManager
 import android.support.v4.app.Fragment
 import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
 import ca.qc.cstj.andromia.EXPLORERS_URL
 
 import ca.qc.cstj.andromia.R
@@ -64,6 +61,7 @@ class LoginFragment : Fragment() {
                         val preferences = activity!!.getSharedPreferences("Andromia", Context.MODE_PRIVATE).edit()
 
                         preferences.putString("token", jsonResult.obj().get("token").toString())
+                        preferences.putString("username", username)
                         // Le commit est utile pour conserver l'information des SharedPreferences en cas d'app crash (autrement, avec apply, on les perdait)
                         preferences.commit()
                         listener!!.onLoginFragmentInteraction()

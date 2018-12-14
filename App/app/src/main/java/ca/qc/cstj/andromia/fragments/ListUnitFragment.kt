@@ -56,8 +56,12 @@ class ListUnitFragment : Fragment() {
                 adapter = UnitRecyclerViewAdapter(units, listener, activity)
             }
 
-            val userToken : String = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6IkNsw6ltZW50IiwiaWF0IjoxNTQ1MTQ2OTI4fQ.TtfAqbuG__BHxDTKu8vyQhjGCqzQIvCnlP_A5K1XhNY"
-            val path : String = "$EXPLORERS_URL/Clement/units"
+            val preferences = activity!!.getSharedPreferences("Andromia", Context.MODE_PRIVATE)
+
+            val userToken = preferences.getString("token", "")
+            val username = preferences.getString("username", "")
+            val path : String = "$EXPLORERS_URL/$username/units"
+
             try {
                 path.httpGet().header(mapOf("Authorization" to "Bearer $userToken")).responseJson() { _, response, result ->
                     when (response.statusCode) {

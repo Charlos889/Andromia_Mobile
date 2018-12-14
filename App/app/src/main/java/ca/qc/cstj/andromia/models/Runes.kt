@@ -14,4 +14,7 @@ data class Runes(val air : Int,
                  val music : Int,
                  val space : Int,
                  val toxic : Int,
-                 val water : Int)
+                 val water : Int) {
+
+    constructor() : this(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
+}

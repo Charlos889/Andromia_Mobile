@@ -2,6 +2,7 @@ package ca.qc.cstj.andromia
 
 import android.content.Context
 import android.content.DialogInterface
+import android.databinding.DataBindingUtil
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.Fragment
@@ -11,6 +12,7 @@ import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.MenuItem
+import ca.qc.cstj.andromia.databinding.HeaderNavigationBinding
 import ca.qc.cstj.andromia.fragments.LoginFragment
 import ca.qc.cstj.andromia.fragments.MapFragment
 import ca.qc.cstj.andromia.fragments.DetailsUnitFragment
@@ -26,11 +28,11 @@ class MainActivity : AppCompatActivity()
         , LoginFragment.OnFragmentInteractionListener
         , MapFragment.OnFragmentInteractionListener {
 
-    private var explorer : Explorer? = null
+    private var explorer = Explorer()
     private var menuOuvert = false
 
     override fun onListFragmentInteraction(unit: Unit?) {
-        modifierTitre(explorer!!.username)
+        modifierTitre(explorer.username)
         changeFragment(DetailsUnitFragment.newInstance(unit))
     }
 
@@ -43,6 +45,7 @@ class MainActivity : AppCompatActivity()
         modifierTitre(utilisateur.username)
 
         txtNomExplorer.text = utilisateur.username
+        txtQtyInox.text = utilisateur.inox.amount.toString()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -62,11 +65,11 @@ class MainActivity : AppCompatActivity()
 
                     modifierReturnButton(fragment)
                     modifierMenuOptions(fragment)
-                    modifierTitre(explorer!!.username)
+                    modifierTitre(explorer.username)
                 }
                 R.id.nvmUnits -> {
                     changeFragment(ListUnitFragment.newInstance(2))
-                    modifierTitre(explorer!!.username)
+                    modifierTitre(explorer.username)
                 }
                 R.id.nvmLogout -> {
                     val preferences = getSharedPreferences("Andromia", Context.MODE_PRIVATE).edit()

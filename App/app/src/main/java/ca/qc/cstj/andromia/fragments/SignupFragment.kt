@@ -1,9 +1,8 @@
-package ca.qc.cstj.andromia.Fragments
+package ca.qc.cstj.andromia.fragments
 
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,13 +14,6 @@ import com.andreabaccega.widget.FormEditText
 import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.httpPost
 import kotlinx.serialization.ImplicitReflectionSerializer
-import kotlinx.serialization.json.JSON
-import kotlinx.serialization.json.JsonArray
-import kotlinx.serialization.json.JsonElement
-import kotlinx.serialization.json.JsonObject
-import kotlinx.serialization.parse
-import kotlinx.serialization.stringify
-import org.json.JSONObject
 
 
 /**

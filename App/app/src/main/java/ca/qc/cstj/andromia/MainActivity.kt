@@ -1,18 +1,21 @@
 package ca.qc.cstj.andromia
 
-import android.app.Activity
-import android.content.Intent
+import android.content.Context
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v4.app.DialogFragment
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
-import android.support.v7.app.AlertDialog
 import android.util.Log
-import ca.qc.cstj.andromia.Fragments.LoginFragment
+import android.widget.Toast
+import ca.qc.cstj.andromia.dialogs.CaptureUnitDialogFragment
+import ca.qc.cstj.andromia.fragments.SignupFragment
 import ca.qc.cstj.andromia.fragments.DetailsUnitFragment
 import ca.qc.cstj.andromia.fragments.ListUnitFragment
+import ca.qc.cstj.andromia.fragments.LoginFragment
+import ca.qc.cstj.andromia.fragments.MapFragment
 import ca.qc.cstj.andromia.models.Explorer
 import ca.qc.cstj.andromia.models.Unit
 import kotlinx.android.synthetic.main.activity_main.*
@@ -22,14 +25,19 @@ import kotlinx.android.synthetic.main.header_navigation.*
 class MainActivity : AppCompatActivity()
         , ListUnitFragment.OnListFragmentInteractionListener
         , LoginFragment.OnFragmentInteractionListener
-        , MapFragment.OnFragmentInteractionListener {
+        , MapFragment.OnFragmentInteractionListener
+        , SignupFragment.OnFragmentInteractionListener
+        , CaptureUnitDialogFragment.CaptureUnitListener{
 
     private var explorer : Explorer? = null
     private var menuOuvert = false
 
     override fun onListFragmentInteraction(unit: Unit?) {
-        modifierTitre(explorer!!.username)
         changeFragment(DetailsUnitFragment.newInstance(unit))
+    }
+
+    override fun onSignupFragmentInteraction() {
+
     }
 
     override fun onLoginFragmentInteraction() {
@@ -189,5 +197,13 @@ class MainActivity : AppCompatActivity()
                 supportActionBar!!.setHomeAsUpIndicator(R.drawable.ic_arrow_back)
             }
         }
+    }
+
+    override fun onDialogPositiveClick(dialog: DialogFragment) {
+        Toast.makeText(this, "Oui", Toast.LENGTH_LONG).show()
+    }
+
+    override fun onDialogNegativeClick(dialog: DialogFragment) {
+        Toast.makeText(this, "Non", Toast.LENGTH_LONG).show()
     }
 }

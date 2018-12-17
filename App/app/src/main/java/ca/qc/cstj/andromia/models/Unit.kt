@@ -14,6 +14,8 @@ data class Unit(val name : String,
                 val set : String,
                 val uuid : String,
                 val kernel : Runes,
-                @Serializable(with = DateSerializer::class) val createdDate : Date) {}
+                @Serializable(with = DateSerializer::class) val createdDate : Date) {
+    constructor() : this("", 0, 0, "", "", UnitRunes(), "", "", Runes(), Date(0))
+}
 
 

@@ -53,7 +53,7 @@ class MapFragment : Fragment()
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_map, container, false)
 
-        view.setOnTouchListener { v, event ->
+        view.setOnTouchListener { _, event ->
             when (event!!.action) {
                 MotionEvent.ACTION_MOVE -> {
                     if (event.pointerCount == 1) {
@@ -190,7 +190,7 @@ class MapFragment : Fragment()
 
     override fun onDown(p0: MotionEvent?): Boolean {
         oldX = p0!!.getX(0)
-        oldY = p0!!.getY(0)
+        oldY = p0.getY(0)
         return true
     }
 

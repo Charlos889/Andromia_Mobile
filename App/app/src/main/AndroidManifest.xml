@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="ca.qc.cstj.andromia">
 
-    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+    <uses-permission android:name="android.permission.INTERNET"/>
 
     <application
         android:allowBackup="true"
@@ -22,7 +22,7 @@
         <activity android:name="com.journeyapps.barcodescanner.CaptureActivity"
             android:screenOrientation="portrait"
             tools:replace="android:screenOrientation"
-            android:stateNotNeeded="true"></activity>
+            android:stateNotNeeded="true"/>
     </application>
 
 </manifest>

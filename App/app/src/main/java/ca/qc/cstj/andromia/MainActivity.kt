@@ -1,6 +1,8 @@
 package ca.qc.cstj.andromia
 
+import android.app.ProgressDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
@@ -8,14 +10,13 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
+import android.support.v7.app.AlertDialog
 import android.util.Log
+import android.view.MenuItem
 import android.widget.Toast
 import ca.qc.cstj.andromia.dialogs.CaptureUnitDialogFragment
-import ca.qc.cstj.andromia.fragments.SignupFragment
-import ca.qc.cstj.andromia.fragments.DetailsUnitFragment
-import ca.qc.cstj.andromia.fragments.ListUnitFragment
-import ca.qc.cstj.andromia.fragments.LoginFragment
-import ca.qc.cstj.andromia.fragments.MapFragment
+import ca.qc.cstj.andromia.fragments.*
+import ca.qc.cstj.andromia.models.Exploration
 import ca.qc.cstj.andromia.models.Explorer
 import ca.qc.cstj.andromia.models.Unit
 import kotlinx.android.synthetic.main.activity_main.*
@@ -26,11 +27,13 @@ class MainActivity : AppCompatActivity()
         , ListUnitFragment.OnListFragmentInteractionListener
         , LoginFragment.OnFragmentInteractionListener
         , MapFragment.OnFragmentInteractionListener
+        , ListExplorationFragment.OnListFragmentInteractionListener
         , SignupFragment.OnFragmentInteractionListener
         , CaptureUnitDialogFragment.CaptureUnitListener{
 
-    private var explorer : Explorer? = null
+    private var explorer = Explorer()
     private var menuOuvert = false
+    private var progressDialog : ProgressDialog? = null
 
     override fun onListFragmentInteraction(unit: Unit?) {
         changeFragment(DetailsUnitFragment.newInstance(unit))
@@ -40,8 +43,17 @@ class MainActivity : AppCompatActivity()
 
     }
 
+    override fun onListExplorationFragmentInteraction(item: Exploration?) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
+
     override fun onLoginFragmentInteraction() {
         changeFragment(MapFragment.newInstance(), false)
+
+        progressDialog = ProgressDialog(this)
+        progressDialog!!.isIndeterminate = true
+        progressDialog!!.setMessage("Chargement en cours...")
+        progressDialog!!.show()
     }
 
     override fun utilisateurCharge(utilisateur: Explorer) {
@@ -49,6 +61,12 @@ class MainActivity : AppCompatActivity()
         modifierTitre(utilisateur.username)
 
         txtNomExplorer.text = utilisateur.username
+        txtQtyInox.text = utilisateur.inox.amount.toString()
+
+        if (progressDialog != null) {
+            progressDialog!!.dismiss()
+        }
+        progressDialog = null
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -68,11 +86,11 @@ class MainActivity : AppCompatActivity()
 
                     modifierReturnButton(fragment)
                     modifierMenuOptions(fragment)
-                    modifierTitre(explorer!!.username)
+                    modifierTitre(explorer.username)
                 }
                 R.id.nvmUnits -> {
                     changeFragment(ListUnitFragment.newInstance(2))
-                    modifierTitre(explorer!!.username)
+                    modifierTitre(explorer.username)
                 }
                 R.id.nvmLogout -> {
                     val preferences = getSharedPreferences("Andromia", Context.MODE_PRIVATE).edit()
@@ -106,6 +124,11 @@ class MainActivity : AppCompatActivity()
             mainLayout.closeDrawer(GravityCompat.START)
         } else {
             super.onBackPressed()
+
+            val fragment = supportFragmentManager.findFragmentById(R.id.contentFrame)
+            modifierReturnButton(fragment)
+            modifierMenuOptions(fragment)
+            modifierNavigationDrawer(fragment)
         }
     }
 

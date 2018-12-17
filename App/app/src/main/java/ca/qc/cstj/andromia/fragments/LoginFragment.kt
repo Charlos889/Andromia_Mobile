@@ -53,7 +53,7 @@ class LoginFragment : Fragment() {
             json.put("username", username)
             json.put("password", password)
 
-            path.httpPost().body(json.toString()).header(mapOf("Content-Type" to "application/json")).responseJson { request, response, result ->
+            path.httpPost().body(json.toString()).header(mapOf("Content-Type" to "application/json")).responseJson { _, response, result ->
                 when (response.statusCode) {
                     200 -> {
                         // Sauvegarder les infos dans les SharedPreferences

@@ -1,6 +1,7 @@
 package ca.qc.cstj.andromia.fragments
 
 import android.content.Context
+import android.opengl.Visibility
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
@@ -18,6 +19,7 @@ import com.github.kittinunf.fuel.Fuel
 import com.github.kittinunf.fuel.android.core.Json
 import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.httpGet
+import kotlinx.android.synthetic.main.fragment_unit_list.*
 import kotlinx.serialization.json.JSON
 import kotlinx.serialization.list
 
@@ -44,49 +46,52 @@ class ListUnitFragment : Fragment() {
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_unit_list, container, false)
+        return inflater.inflate(R.layout.fragment_unit_list, container, false)
+
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
 
         // Set the adapter
-        if (view is RecyclerView) {
-            with(view) {
-                layoutManager = when {
-                    columnCount <= 1 -> LinearLayoutManager(context)
-                    else -> GridLayoutManager(context, columnCount)
-                }
-                adapter = UnitRecyclerViewAdapter(units, listener, activity)
-            }
+        rcvUnits.layoutManager = when {
+            columnCount <= 1 -> LinearLayoutManager(context)
+            else -> GridLayoutManager(context, columnCount)
+        }
+        rcvUnits.adapter = UnitRecyclerViewAdapter(units, listener, activity)
 
-            val preferences = activity!!.getSharedPreferences("Andromia", Context.MODE_PRIVATE)
 
-            val userToken = preferences.getString("token", "")
-            val username = preferences.getString("username", "")
-            val path : String = "$EXPLORERS_URL/$username/units"
+        val preferences = activity!!.getSharedPreferences("Andromia", Context.MODE_PRIVATE)
 
-            try {
-                path.httpGet().header(mapOf("Authorization" to "Bearer $userToken")).responseJson() { _, response, result ->
-                    when (response.statusCode) {
-                        200 -> {
-                            var lstUnits: List<Unit>
-                            val json = result.get()
-                            val items = json.obj().get("items")
-                            lstUnits = JSON.nonstrict.parse(Unit.serializer().list, items.toString())
+        val userToken = preferences.getString("token", "")
+        val username = preferences.getString("username", "")
+        val path : String = "$EXPLORERS_URL/$username/units"
 
-                            units.clear()
-                            units.addAll(lstUnits.toMutableList())
-                            view.adapter.notifyDataSetChanged()
-                        }
-                        else -> {
-                            Toast.makeText(activity, "Le serveur est présentement inaccessible..", Toast.LENGTH_LONG).show()
+        try {
+            path.httpGet().header(mapOf("Authorization" to "Bearer $userToken")).responseJson() { _, response, result ->
+                when (response.statusCode) {
+                    200 -> {
+                        var lstUnits: List<Unit>
+                        val json = result.get()
+                        val items = json.obj().get("items")
+                        lstUnits = JSON.nonstrict.parse(Unit.serializer().list, items.toString())
+
+                        units.clear()
+                        units.addAll(lstUnits.toMutableList())
+                        if(units.size > 0)
+                            rcvUnits.adapter.notifyDataSetChanged()
+                        else {
+                            txvNoUnit.visibility = View.VISIBLE
                         }
                     }
+                    else -> {
+                        Toast.makeText(activity, "Le serveur est présentement inaccessible..", Toast.LENGTH_LONG).show()
+                    }
                 }
-            } catch (e : Exception)
-            {
-                Toast.makeText(activity, e.message, Toast.LENGTH_LONG).show()
             }
+        } catch (e : Exception) {
+            Toast.makeText(activity, e.message, Toast.LENGTH_LONG).show()
         }
-
-        return view
     }
 
     override fun onAttach(context: Context) {

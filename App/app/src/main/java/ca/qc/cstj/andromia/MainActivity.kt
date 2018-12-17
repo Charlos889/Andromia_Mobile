@@ -2,13 +2,19 @@ package ca.qc.cstj.andromia
 
 import android.app.ProgressDialog
 import android.content.Context
+import android.content.DialogInterface
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v4.app.DialogFragment
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
+import android.support.v7.app.AlertDialog
 import android.util.Log
+import android.view.MenuItem
+import android.widget.Toast
+import ca.qc.cstj.andromia.dialogs.CaptureUnitDialogFragment
 import ca.qc.cstj.andromia.fragments.*
 import ca.qc.cstj.andromia.models.Exploration
 import ca.qc.cstj.andromia.models.Explorer
@@ -21,15 +27,20 @@ class MainActivity : AppCompatActivity()
         , ListUnitFragment.OnListFragmentInteractionListener
         , LoginFragment.OnFragmentInteractionListener
         , MapFragment.OnFragmentInteractionListener
-        , ListExplorationFragment.OnListFragmentInteractionListener {
+        , ListExplorationFragment.OnListFragmentInteractionListener
+        , SignupFragment.OnFragmentInteractionListener
+        , CaptureUnitDialogFragment.CaptureUnitListener{
 
     private var explorer = Explorer()
     private var menuOuvert = false
     private var progressDialog : ProgressDialog? = null
 
     override fun onListFragmentInteraction(unit: Unit?) {
-        modifierTitre(explorer.username)
         changeFragment(DetailsUnitFragment.newInstance(unit))
+    }
+
+    override fun onSignupFragmentInteraction() {
+
     }
 
     override fun onListExplorationFragmentInteraction(item: Exploration?) {
@@ -209,5 +220,13 @@ class MainActivity : AppCompatActivity()
                 supportActionBar!!.setHomeAsUpIndicator(R.drawable.ic_arrow_back)
             }
         }
+    }
+
+    override fun onDialogPositiveClick(dialog: DialogFragment) {
+        Toast.makeText(this, "Oui", Toast.LENGTH_LONG).show()
+    }
+
+    override fun onDialogNegativeClick(dialog: DialogFragment) {
+        Toast.makeText(this, "Non", Toast.LENGTH_LONG).show()
     }
 }

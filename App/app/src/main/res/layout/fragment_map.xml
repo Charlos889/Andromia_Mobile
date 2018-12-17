@@ -29,12 +29,11 @@ android:id="@+id/ctlMap">
         android:layout_height="50dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:scaleType="fitXY"
+        android:scaleType="fitCenter"
         android:background="@color/primaryColor"
         android:paddingLeft="10dp"
         android:paddingRight="10dp"
         android:layout_marginBottom="5dp"
-        android:src="@drawable/portal"
-        android:translationZ="20dp"/>
+        android:src="@drawable/portal" />
 
 </RelativeLayout>

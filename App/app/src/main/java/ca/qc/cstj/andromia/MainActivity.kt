@@ -1,18 +1,24 @@
 package ca.qc.cstj.andromia
 
-import android.app.Activity
-import android.content.Intent
+
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.util.Log
+import ca.qc.cstj.andromia.Fragments.SignupFragment
 import ca.qc.cstj.andromia.Fragments.LoginFragment
 import ca.qc.cstj.andromia.fragments.DetailsUnitFragment
 import ca.qc.cstj.andromia.fragments.ListUnitFragment
 import ca.qc.cstj.andromia.models.Unit
 
 
-class MainActivity : AppCompatActivity(), ListUnitFragment.OnListFragmentInteractionListener, LoginFragment.OnFragmentInteractionListener {
+class MainActivity : AppCompatActivity(), ListUnitFragment.OnListFragmentInteractionListener, LoginFragment.OnFragmentInteractionListener,
+                        SignupFragment.OnFragmentInteractionListener {
+
+    override fun onSignupFragmentInteraction() {
+
+    }
+
     override fun onListFragmentInteraction(unit: Unit?) {
         changeFragment(DetailsUnitFragment.newInstance(unit))
     }
@@ -28,7 +34,7 @@ class MainActivity : AppCompatActivity(), ListUnitFragment.OnListFragmentInterac
         /*val intent = Intent(this,ScanActivity::class.java)
         startActivity(intent)*/
 
-        changeFragment(ListUnitFragment.newInstance(2), true, true)
+        changeFragment(SignupFragment.newInstance(), false, true)
 
     }
 

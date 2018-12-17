@@ -1,0 +1,105 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent"
+    android:layout_width="match_parent">
+
+    <LinearLayout
+        android:id="@+id/lilInputs"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal"
+        android:layout_marginTop="50dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:theme="@style/TextLabel"
+            >
+
+            <com.andreabaccega.widget.FormEditText
+                android:id="@+id/edtUsername"
+                android:layout_width="250dp"
+                android:layout_height="40dp"
+                android:hint="@string/username"
+                android:inputType="text"
+                app:testType="alphaNumeric"
+                app:emptyErrorString="@string/error_field_must_not_be_empty"
+                app:testErrorString="@string/error_this_field_cannot_contain_special_character"
+                />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:theme="@style/TextLabel"
+            >
+
+            <com.andreabaccega.widget.FormEditText
+                android:id="@+id/edtEmail"
+                android:layout_width="250dp"
+                android:layout_height="40dp"
+                android:hint="@string/email"
+                android:inputType="textEmailAddress"
+                app:testType="email"
+                app:emptyErrorString="@string/error_field_must_not_be_empty"
+                app:testErrorString="@string/error_email_address_not_valid"
+                />
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:theme="@style/TextLabel"
+            >
+            <com.andreabaccega.widget.FormEditText
+                android:id="@+id/edtPassword"
+                android:layout_width="250dp"
+                android:layout_height="40dp"
+                android:hint="@string/password"
+                android:inputType="textPassword"
+                app:testType="alphaNumeric"
+                app:emptyErrorString="@string/error_field_must_not_be_empty"
+                app:testErrorString="@string/error_this_field_cannot_contain_special_character"
+                />
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:theme="@style/TextLabel"
+            >
+            <com.andreabaccega.widget.FormEditText
+                android:id="@+id/edtPasswordRepeat"
+                android:layout_width="250dp"
+                android:layout_height="40dp"
+                android:hint="@string/passwordRepeat"
+                android:inputType="textPassword"
+                app:testType="alphaNumeric"
+                app:emptyErrorString="@string/error_field_must_not_be_empty"
+                app:testErrorString="@string/error_this_field_cannot_contain_special_character"
+                />
+
+        </android.support.design.widget.TextInputLayout>
+
+
+        <Button
+            android:id="@+id/btnSignup"
+            android:layout_width="200dp"
+            android:layout_height="40dp"
+            android:text="@string/signup"
+            android:layout_marginTop="24dp"
+            />
+    </LinearLayout>
+
+
+</android.support.constraint.ConstraintLayout>

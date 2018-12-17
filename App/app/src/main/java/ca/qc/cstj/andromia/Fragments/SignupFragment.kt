@@ -1,18 +1,27 @@
 package ca.qc.cstj.andromia.Fragments
 
 import android.content.Context
-import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.EditText
-
+import android.widget.Toast
+import ca.qc.cstj.andromia.EXPLORERS_URL
 import ca.qc.cstj.andromia.R
 import kotlinx.android.synthetic.main.fragment_signup.*
 import com.andreabaccega.widget.FormEditText
-
+import com.github.kittinunf.fuel.android.extension.responseJson
+import com.github.kittinunf.fuel.httpPost
+import kotlinx.serialization.ImplicitReflectionSerializer
+import kotlinx.serialization.json.JSON
+import kotlinx.serialization.json.JsonArray
+import kotlinx.serialization.json.JsonElement
+import kotlinx.serialization.json.JsonObject
+import kotlinx.serialization.parse
+import kotlinx.serialization.stringify
+import org.json.JSONObject
 
 
 /**
@@ -38,6 +47,7 @@ class SignupFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_signup, container, false)
     }
 
+    @ImplicitReflectionSerializer
     override fun onStart() {
         super.onStart()
 
@@ -46,6 +56,7 @@ class SignupFragment : Fragment() {
         }
     }
 
+    @ImplicitReflectionSerializer
     fun onSignupPressed() {
 
         val allFields = arrayOf<FormEditText>(edtUsername, edtEmail, edtPassword, edtPasswordRepeat)
@@ -60,7 +71,17 @@ class SignupFragment : Fragment() {
         }
 
         if (allValid) {
-            //listener?.onSignupFragmentInteraction()
+            val InfosUser : String = """{"username":"${edtUsername.text}","email":"${edtEmail.text}","password":"${edtPassword.text}"}"""
+            EXPLORERS_URL.httpPost().jsonBody(InfosUser).responseJson{request, response, result ->
+                when(response.statusCode) {
+                    201 -> {
+                        val json = result.get()
+                    }
+                    else -> {
+                        Toast.makeText(activity,"${response.statusCode}, ${response.responseMessage}", Toast.LENGTH_LONG).show()
+                    }
+                }
+            }
         } else {
             // EditText are going to appear with an exclamation mark and an explicative message.
         }

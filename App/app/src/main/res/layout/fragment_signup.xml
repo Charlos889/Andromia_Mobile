@@ -24,7 +24,7 @@
             <com.andreabaccega.widget.FormEditText
                 android:id="@+id/edtUsername"
                 android:layout_width="250dp"
-                android:layout_height="40dp"
+                android:layout_height="60dp"
                 android:hint="@string/username"
                 android:inputType="text"
                 app:testType="alphaNumeric"
@@ -44,7 +44,7 @@
             <com.andreabaccega.widget.FormEditText
                 android:id="@+id/edtEmail"
                 android:layout_width="250dp"
-                android:layout_height="40dp"
+                android:layout_height="60dp"
                 android:hint="@string/email"
                 android:inputType="textEmailAddress"
                 app:testType="email"
@@ -63,7 +63,7 @@
             <com.andreabaccega.widget.FormEditText
                 android:id="@+id/edtPassword"
                 android:layout_width="250dp"
-                android:layout_height="40dp"
+                android:layout_height="60dp"
                 android:hint="@string/password"
                 android:inputType="textPassword"
                 app:testType="alphaNumeric"
@@ -81,7 +81,7 @@
             <com.andreabaccega.widget.FormEditText
                 android:id="@+id/edtPasswordRepeat"
                 android:layout_width="250dp"
-                android:layout_height="40dp"
+                android:layout_height="60dp"
                 android:hint="@string/passwordRepeat"
                 android:inputType="textPassword"
                 app:testType="alphaNumeric"

@@ -44,7 +44,7 @@ class MapFragment : Fragment(), GestureDetector.OnGestureListener, GestureDetect
 
         path.httpGet()
                 .header(mapOf("Authorization" to "Bearer ${preferences.getString("token", "")}"))
-                .responseJson { request, response, result ->
+                .responseJson { _, response, result ->
 
                     when (response.statusCode) {
                         200 -> {
@@ -75,7 +75,7 @@ class MapFragment : Fragment(), GestureDetector.OnGestureListener, GestureDetect
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_map, container, false)
 
-        view.setOnTouchListener { v, event ->
+        view.setOnTouchListener { _, event ->
             when (event!!.action) {
                 MotionEvent.ACTION_MOVE -> {
                     if (event.pointerCount == 1) {
@@ -151,7 +151,7 @@ class MapFragment : Fragment(), GestureDetector.OnGestureListener, GestureDetect
             }
         })
 
-        btnScan.setOnTouchListener { v, event ->
+        btnScan.setOnTouchListener { _, _ ->
 
             val scanner = IntentIntegrator.forSupportFragment(this)
             scanner.initiateScan()
@@ -186,7 +186,7 @@ class MapFragment : Fragment(), GestureDetector.OnGestureListener, GestureDetect
 
     override fun onDown(p0: MotionEvent?): Boolean {
         oldX = p0!!.getX(0)
-        oldY = p0!!.getY(0)
+        oldY = p0.getY(0)
         return true
     }
 

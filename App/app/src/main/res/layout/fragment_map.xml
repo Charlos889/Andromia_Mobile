@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+xmlns:tools="http://schemas.android.com/tools"
+android:layout_width="match_parent"
+android:layout_height="match_parent"
+tools:context=".fragments.MapFragment"
+android:background="@color/backgroundMap"
+android:id="@+id/ctlMap">
+
+    <ImageView
+        android:id="@+id/imgMap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:scaleX="@dimen/BASE_SCALE"
+        android:scaleY="@dimen/BASE_SCALE"
+        android:src="@drawable/andromia" />
+
+    <Button
+        android:id="@+id/btnPosition"
+        android:layout_width="15dp"
+        android:layout_height="15dp"
+        android:layout_centerInParent="true"
+        android:background="@drawable/point_position"
+        android:clickable="false"/>
+
+    <ImageButton
+        android:id="@+id/btnScan"
+        android:layout_width="120dp"
+        android:layout_height="50dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:scaleType="fitXY"
+        android:background="@color/colorAccent"
+        android:paddingLeft="10dp"
+        android:paddingRight="10dp"
+        android:layout_marginBottom="5dp"
+        android:src="@drawable/portal" />
+
+</RelativeLayout>

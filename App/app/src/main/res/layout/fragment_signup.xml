@@ -15,35 +15,37 @@
         app:layout_constraintTop_toTopOf="parent">
 
         <android.support.design.widget.TextInputLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:layout_marginStart="20dp"
             android:layout_marginTop="16dp"
-            android:theme="@style/TextLabel"
-            >
+            android:layout_marginEnd="20dp"
+            android:theme="@style/TextLabel">
 
             <com.andreabaccega.widget.FormEditText
-                android:id="@+id/edtUsername"
-                android:layout_width="250dp"
+                android:id="@+id/edtUsernameSignup"
+                android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:hint="@string/username"
                 android:inputType="text"
-                app:testType="alphaNumeric"
                 app:emptyErrorString="@string/error_field_must_not_be_empty"
                 app:testErrorString="@string/error_this_field_cannot_contain_special_character"
-                />
+                app:testType="alphaNumeric" />
 
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:theme="@style/TextLabel"
             >
 
             <com.andreabaccega.widget.FormEditText
-                android:id="@+id/edtEmail"
-                android:layout_width="250dp"
+                android:id="@+id/edtEmailSignup"
+                android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:hint="@string/email"
                 android:inputType="textEmailAddress"
@@ -55,14 +57,16 @@
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:theme="@style/TextLabel"
             >
             <com.andreabaccega.widget.FormEditText
-                android:id="@+id/edtPassword"
-                android:layout_width="250dp"
+                android:id="@+id/edtPasswordSignup"
+                android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:hint="@string/password"
                 android:inputType="textPassword"
@@ -74,14 +78,16 @@
         </android.support.design.widget.TextInputLayout>
 
         <android.support.design.widget.TextInputLayout
-            android:layout_width="wrap_content"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="16dp"
+            android:layout_marginStart="20dp"
+            android:layout_marginEnd="20dp"
             android:theme="@style/TextLabel"
             >
             <com.andreabaccega.widget.FormEditText
-                android:id="@+id/edtPasswordRepeat"
-                android:layout_width="250dp"
+                android:id="@+id/edtPasswordRepeatSignup"
+                android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:hint="@string/passwordRepeat"
                 android:inputType="textPassword"
@@ -97,7 +103,7 @@
         <Button
             android:id="@+id/btnSignup"
             android:layout_width="200dp"
-            android:layout_height="40dp"
+            android:layout_height="50dp"
             android:text="@string/signup"
             android:layout_marginTop="24dp"
             />

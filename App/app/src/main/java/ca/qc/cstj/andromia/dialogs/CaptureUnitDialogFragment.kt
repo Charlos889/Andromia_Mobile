@@ -1,13 +1,10 @@
 package ca.qc.cstj.andromia.dialogs
 
-import android.annotation.SuppressLint
 import android.app.AlertDialog
 import android.app.Dialog
 import android.support.v4.app.DialogFragment
 import android.content.Context
 import android.os.Bundle
-import android.view.LayoutInflater
-import android.view.View
 import android.widget.ImageView
 import ca.qc.cstj.andromia.R
 import ca.qc.cstj.andromia.models.Unit

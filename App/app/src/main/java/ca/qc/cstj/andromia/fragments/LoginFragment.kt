@@ -48,6 +48,10 @@ class LoginFragment : Fragment() {
             onLoginPressed()
         }
 
+        btnSignup.setOnClickListener {
+            listener!!.ouvrirSignup()
+        }
+
         super.onStart()
     }
 
@@ -77,7 +81,8 @@ class LoginFragment : Fragment() {
      * for more information.
      */
     interface OnFragmentInteractionListener {
-        fun onLoginFragmentInteraction()
+        fun connectionEffecutee()
+        fun ouvrirSignup()
     }
 
     companion object {
@@ -130,7 +135,7 @@ class LoginFragment : Fragment() {
                     preferences.putString("username", username)
                     // Le commit est utile pour conserver l'information des SharedPreferences en cas d'app crash (autrement, avec apply, on les perdait)
                     preferences.commit()
-                    listener!!.onLoginFragmentInteraction()
+                    listener!!.connectionEffecutee()
                 }
                 // TODO : Implémenter les codes d'erreur
                 else -> {

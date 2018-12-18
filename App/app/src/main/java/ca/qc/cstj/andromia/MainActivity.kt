@@ -49,7 +49,9 @@ class MainActivity : AppCompatActivity()
     }
 
     override fun onListExplorationFragmentInteraction(item: Exploration?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        if (item?.unit != null && item.capture) {
+            changeFragment(DetailsUnitFragment.newInstance(item.unit))
+        }
     }
 
     override fun ouvrirSignup() {
@@ -100,6 +102,9 @@ class MainActivity : AppCompatActivity()
                 R.id.nvmUnits -> {
                     changeFragment(ListUnitFragment.newInstance(2))
                     modifierTitre(explorer.username)
+                }
+                R.id.nvmExplorations -> {
+                    changeFragment(ListExplorationFragment.newInstance(explorer.explorations))
                 }
                 R.id.nvmLogout -> {
                     val preferences = getSharedPreferences("Andromia", Context.MODE_PRIVATE).edit()

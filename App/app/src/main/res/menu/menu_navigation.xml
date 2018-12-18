@@ -11,6 +11,10 @@
             android:id="@+id/nvmUnits"
             android:icon="@drawable/unit"
             android:title="Units" />
+        <item
+            android:id="@+id/nvmExplorations"
+            android:title="Explorations"
+            />
     </group>
     <group
         android:id="@+id/menu_bottom"

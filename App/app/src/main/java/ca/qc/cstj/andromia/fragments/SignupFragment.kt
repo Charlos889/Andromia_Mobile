@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.inputmethod.InputMethodManager
 import android.widget.Toast
 import ca.qc.cstj.andromia.EXPLORERS_URL
 import ca.qc.cstj.andromia.R
@@ -44,26 +45,40 @@ class SignupFragment : Fragment() {
         super.onStart()
 
         btnSignup.setOnClickListener {
+            closeKeyboard()
             onSignupPressed()
         }
     }
 
-    @ImplicitReflectionSerializer
-    fun onSignupPressed() {
+    private fun onSignupPressed() {
 
-        val allFields = arrayOf<FormEditText>(edtUsername, edtEmail, edtPassword, edtPasswordRepeat)
+        val allFields = arrayOf<FormEditText>(edtUsernameSignup, edtEmailSignup, edtPasswordSignup, edtPasswordRepeatSignup)
 
         var allValid = true
         for (field in allFields) {
             allValid = field.testValidity() && allValid
-            if(field == edtUsername && field.text.length > 25) {
+
+            // Check for username max length
+            if(field == edtUsernameSignup && field.text.length > 25) {
                 field.setError("Your username must not exceed 25 characters")
-                allValid = false && allValid
+                allValid = false
+            }
+
+            // Check for username min length
+            if(field == edtUsernameSignup && field.text.length < 3) {
+                field.setError("Your username must have at least 3 characters")
+                allValid = false
+            }
+
+            // Check for password and password confirmation integrity
+            if(field == edtPasswordRepeatSignup && edtPasswordSignup.text != edtPasswordRepeatSignup.text) {
+                field.setError("There is a mismatch between your password and the confirmation")
+                allValid = false
             }
         }
 
         if (allValid) {
-            val InfosUser : String = """{"username":"${edtUsername.text}","email":"${edtEmail.text}","password":"${edtPassword.text}"}"""
+            val InfosUser : String = """{"username":"${edtUsernameSignup.text}","email":"${edtEmailSignup.text}","password":"${edtPasswordSignup.text}"}"""
             EXPLORERS_URL.httpPost().jsonBody(InfosUser).responseJson{request, response, result ->
                 when(response.statusCode) {
                     201 -> {
@@ -121,5 +136,13 @@ class SignupFragment : Fragment() {
         @JvmStatic
         fun newInstance() =
                 SignupFragment()
+    }
+
+    private fun closeKeyboard() {
+        val view = this.view
+        if(view != null) {
+            val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
+            imm.hideSoftInputFromWindow(view.windowToken, 0)
+        }
     }
 }

@@ -1,33 +1,67 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context=".fragments.LoginFragment"
     android:orientation="vertical">
 
-    <EditText
-        android:id="@+id/edtUsername"
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:hint="Username or email"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"/>
+        android:orientation="vertical"
+        android:layout_marginTop="50dp"
+        app:layout_constraintTop_toTopOf="parent">
 
-    <EditText
-        android:id="@+id/edtPassword"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Password"
-        android:layout_marginLeft="20dp"
-        android:layout_marginRight="20dp"
-        android:inputType="textPassword"
-        android:fontFamily="sans-serif"/>
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="20dp"
+            android:theme="@style/TextLabel">
 
-    <Button
-        android:id="@+id/btnLogin"
-        android:layout_width="wrap_content"
-        android:layout_height="50dp"
-        android:text="Login"
-        android:layout_gravity="center_horizontal"/>
-</LinearLayout>
+            <com.andreabaccega.widget.FormEditText
+                android:id="@+id/edtUsernameLogin"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:hint="Username or email"
+                app:testType="nocheck"
+                app:testErrorString="Your username is required"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <android.support.design.widget.TextInputLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginStart="20dp"
+            android:layout_marginTop="16dp"
+            android:layout_marginEnd="20dp"
+            android:theme="@style/TextLabel">
+
+
+            <com.andreabaccega.widget.FormEditText
+                android:id="@+id/edtPasswordLogin"
+                android:layout_width="match_parent"
+                android:layout_height="60dp"
+                android:hint="Password"
+                android:inputType="textPassword"
+                android:fontFamily="sans-serif"
+                app:testType="nocheck"
+                app:testErrorString="Your password is required"/>
+
+        </android.support.design.widget.TextInputLayout>
+
+        <Button
+            android:id="@+id/btnLogin"
+            android:layout_width="wrap_content"
+            android:layout_height="50dp"
+            android:layout_marginTop="24dp"
+            android:text="Login"
+            android:layout_gravity="center_horizontal"/>
+
+    </LinearLayout>
+</android.support.constraint.ConstraintLayout>

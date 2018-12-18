@@ -40,14 +40,23 @@ class MainActivity : AppCompatActivity()
     }
 
     override fun onSignupFragmentInteraction() {
+        changeFragment(MapFragment.newInstance(), false)
 
+        progressDialog = ProgressDialog(this)
+        progressDialog!!.isIndeterminate = true
+        progressDialog!!.setMessage("Chargement en cours...")
+        progressDialog!!.show()
     }
 
     override fun onListExplorationFragmentInteraction(item: Exploration?) {
         TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
     }
 
-    override fun onLoginFragmentInteraction() {
+    override fun ouvrirSignup() {
+        changeFragment(SignupFragment.newInstance())
+    }
+
+    override fun connectionEffecutee() {
         changeFragment(MapFragment.newInstance(), false)
 
         progressDialog = ProgressDialog(this)
@@ -184,7 +193,7 @@ class MainActivity : AppCompatActivity()
 
     private fun modifierMenuOptions(fragmentActuel: Fragment) {
         menuOuvert = when (fragmentActuel) {
-            is LoginFragment -> {
+            is LoginFragment, is SignupFragment -> {
                 false
             }
             else -> {
@@ -197,7 +206,7 @@ class MainActivity : AppCompatActivity()
 
     private fun modifierNavigationDrawer(fragmentActuel: Fragment) {
         when (fragmentActuel) {
-            is LoginFragment -> {
+            is LoginFragment, is SignupFragment -> {
                 mainLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
             }
             else -> {

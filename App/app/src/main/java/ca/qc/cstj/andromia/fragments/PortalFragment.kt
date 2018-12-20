@@ -1,5 +1,6 @@
 package ca.qc.cstj.andromia.fragments
 
+import android.app.AlertDialog
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
@@ -14,7 +15,6 @@ import ca.qc.cstj.andromia.PORTALS_URL
 
 import ca.qc.cstj.andromia.R
 import ca.qc.cstj.andromia.dialogs.CaptureUnitDialogFragment
-import ca.qc.cstj.andromia.dialogs.PortalNotFoundDialogFragment
 import ca.qc.cstj.andromia.dialogs.RunesFoundDialogFragment
 import ca.qc.cstj.andromia.models.ExplorationBase
 import ca.qc.cstj.andromia.models.Explorer
@@ -125,8 +125,13 @@ class PortalFragment :   Fragment()
                     }
                 }
                 404 -> {
-                    val dialog = PortalNotFoundDialogFragment()
-                    dialog.show(childFragmentManager, "PortalNotFound")
+
+                    val builder = AlertDialog.Builder(activity)
+                    val dialog = builder.setTitle("Error")
+                            .setMessage("The portal that you scanned could not be found..")
+                            .setNeutralButton("Okay", {dialog, id -> })
+                            .create()
+                    dialog.show()
                 }
             }
         }

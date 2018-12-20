@@ -1,10 +1,12 @@
 package ca.qc.cstj.andromia.fragments
 
 import android.content.Context
+import android.content.res.Configuration
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
+import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +18,7 @@ import ca.qc.cstj.andromia.models.Pagination
 import ca.qc.cstj.andromia.models.Unit
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.serialization.responseObject
+import kotlinx.android.synthetic.main.fragment_exploration_list.*
 import kotlinx.android.synthetic.main.fragment_unit_list.*
 import kotlinx.serialization.json.JSON
 
@@ -26,26 +29,22 @@ import kotlinx.serialization.json.JSON
  * [ListUnitFragment.OnListFragmentInteractionListener] interface.
  */
 class ListUnitFragment : Fragment() {
-
-    private var columnCount = 1
-
     private var listener: OnListUnitFragmentInteractionListener? = null
     private var units : MutableList<Unit> = mutableListOf()
-    private var pageNumber : Int = 0
-    private var pageLimit : Int = 8
+    private var pagination : Pagination<Unit>? = null
+    private var gridLayoutManager : GridLayoutManager? = null
+    private var isLoading : Boolean = false
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-
-        arguments?.let {
-            columnCount = it.getInt(ARG_COLUMN_COUNT)
-            pageNumber = it.getInt(ARG_PAGE_NUMBER)
-            pageLimit = it.getInt(ARG_PAGE_LIMIT)
-        }
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
+        isLoading = false
+
+        if(resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT)
+            gridLayoutManager = GridLayoutManager(activity, 2)
+        else if(resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
+            gridLayoutManager = GridLayoutManager(activity, 3)
+
         return inflater.inflate(R.layout.fragment_unit_list, container, false)
 
     }
@@ -54,50 +53,35 @@ class ListUnitFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         // Set the adapter
-        rcvUnits.layoutManager = when {
-            columnCount <= 1 -> LinearLayoutManager(context)
-            else -> GridLayoutManager(context, columnCount)
-        }
-        rcvUnits.adapter = UnitRecyclerViewAdapter(units, listener, activity)
+        with(rcvUnits) {
+            layoutManager = gridLayoutManager
+            adapter = UnitRecyclerViewAdapter(units, listener, activity)
 
-        if(units.size == 0) {
-            txvNoUnit.visibility = View.VISIBLE
-        }
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+                    // Pagination
+                    super.onScrolled(recyclerView, dx, dy)
 
-        val preferences = activity!!.getSharedPreferences("Andromia", Context.MODE_PRIVATE)
+                    val visibleItemCount = gridLayoutManager!!.childCount
+                    val totalItemCount = gridLayoutManager!!.itemCount
+                    val pastVisibleItems = gridLayoutManager!!.findFirstVisibleItemPosition()
 
-        val userToken = preferences.getString("token", "")
-        val username = preferences.getString("username", "")
-        val path = "$EXPLORERS_URL/$username/units"
-
-        try {
-            val parameters = mutableListOf<Pair<String, Int>>()
-            parameters.add(Pair("pageLimit", 8))
-
-            path.httpGet(parameters)
-                    .header(mapOf("Authorization" to "Bearer $userToken"))
-                    .responseObject<Pagination<Unit>>(json = JSON(strictMode = false)) { _, response, result ->
-                when (response.statusCode) {
-                    200 -> {
-                        units.clear()
-                        units = result.get().items.subList(pageNumber*pageLimit, pageLimit).toMutableList()
-
-                        if (units.size > 0) {
-                            rcvUnits.adapter.notifyDataSetChanged()
-                            txvNoUnit.visibility = View.GONE
-                        }
-                        else {
-                            txvNoUnit.visibility = View.VISIBLE
+                    if (visibleItemCount + pastVisibleItems >= totalItemCount && !isLoading) {
+                        // Si la première requête n'a rien retourné, alors pagination peut être null
+                        if (pagination == null) {
+                            getUnits(null)
+                        } else if (!pageDejaChargee(pagination!!._links.last.href)) {
+                            getUnits(pagination!!._links.next.href)
                         }
                     }
-                    // Ici, on  ne gère pas les codes d'erreurs, car comme on passe la liste des units de l'explorer
-                    // dans le constructeur, cette requête ne permet que d'updater la liste, donc même s'il y a une erreur,
-                    // on pourra quand même afficher une liste, donc afficher l'erreur semble inutile. (Si c'est que le serveur
-                    // est down, il obtiendra l'erreur en revenant au menu principal)
                 }
-            }
-        } catch (e : Exception) {
-            Toast.makeText(activity, e.message, Toast.LENGTH_LONG).show()
+            })
+        }
+
+
+        if(units.isEmpty()) {
+            txvNoUnit.visibility = View.VISIBLE
+            getUnits(null)
         }
     }
 
@@ -113,6 +97,56 @@ class ListUnitFragment : Fragment() {
     override fun onDetach() {
         super.onDetach()
         listener = null
+    }
+
+    private fun getUnits(page : String?) {
+
+        isLoading = true
+
+        val preferences = activity!!.getSharedPreferences("Andromia", Context.MODE_PRIVATE)
+        val userToken = preferences.getString("token", "")
+        val username = preferences.getString("username", "")
+
+        val parameters = mutableListOf<Pair<String, Int>>()
+        parameters.add(Pair("pageLimit", 8))
+
+        val path = if(page == null) {
+            "$EXPLORERS_URL/$username/units"
+        } else {
+            page
+        }
+
+        path.httpGet(parameters)
+            .header(mapOf("Authorization" to "Bearer $userToken"))
+            .responseObject<Pagination<Unit>>(json = JSON(strictMode = false)) { _, response, result ->
+                when (response.statusCode) {
+                    200 -> {
+                        units.clear()
+                        units = result.get().items.toMutableList()
+
+                        if (!units.isEmpty()) {
+                            rcvUnits.adapter.notifyDataSetChanged()
+                            txvNoUnit.visibility = View.GONE
+                        } else {
+                            txvNoUnit.visibility = View.VISIBLE
+                        }
+                        isLoading = false
+                    }
+                    // Ici, on  ne gère pas les codes d'erreurs, car comme on passe la liste des units de l'explorer
+                    // dans le constructeur, cette requête ne permet que d'updater la liste, donc même s'il y a une erreur,
+                    // on pourra quand même afficher une liste, donc afficher l'erreur semble inutile. (Si c'est que le serveur
+                    // est down, il obtiendra l'erreur en revenant au menu principal)
+                }
+            }
+    }
+
+    private fun pageDejaChargee(page: String) : Boolean {
+        // Vérifie si la page demandée a déjà été chargée
+        return (pagination != null && obtenirPage(pagination!!._links.self.href) >= obtenirPage(page))
+    }
+
+    private fun obtenirPage(page: String) : Int {
+        return page.substring(page.indexOf("page=") + 5, page.indexOf("&")).toInt()
     }
 
     /**
@@ -132,21 +166,11 @@ class ListUnitFragment : Fragment() {
 
     companion object {
 
-        const val ARG_COLUMN_COUNT = "column-count"
-        const val ARG_PAGE_NUMBER = "page-number"
-        const val ARG_PAGE_LIMIT = "page-limit"
-
         // TODO: Customize parameter initialization
         @JvmStatic
-        fun newInstance(columnCount: Int, units: List<Unit>, pageNumber : Int = 0, pageLimit : Int = 8) =
+        fun newInstance(units: List<Unit>) =
                 ListUnitFragment().apply {
                     this.units = units.toMutableList()
-
-                    arguments = Bundle().apply {
-                        putInt(ARG_COLUMN_COUNT, columnCount)
-                        putInt(ARG_PAGE_NUMBER, pageNumber)
-                        putInt(ARG_PAGE_LIMIT, pageLimit)
-                    }
                 }
     }
 }

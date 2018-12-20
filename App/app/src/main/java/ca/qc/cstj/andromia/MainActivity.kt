@@ -2,11 +2,8 @@ package ca.qc.cstj.andromia
 
 import android.app.ProgressDialog
 import android.content.Context
-import android.content.DialogInterface
-import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
-import android.support.v4.app.DialogFragment
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.view.GravityCompat
@@ -14,20 +11,13 @@ import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
 import android.util.Log
-import android.view.MenuItem
-import android.widget.Toast
 import ca.qc.cstj.andromia.adapters.RunesNavigationDrawerAdapter
-import ca.qc.cstj.andromia.adapters.RunesRecyclerViewAdapter
-import ca.qc.cstj.andromia.dialogs.CaptureUnitDialogFragment
-import ca.qc.cstj.andromia.dialogs.PortalNotFoundDialogFragment
 import ca.qc.cstj.andromia.fragments.*
 import ca.qc.cstj.andromia.models.Exploration
 import ca.qc.cstj.andromia.models.Explorer
 import ca.qc.cstj.andromia.models.Runes
 import ca.qc.cstj.andromia.models.Unit
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.android.synthetic.main.fragment_details_unit.*
-import kotlinx.android.synthetic.main.fragment_unit_list.*
 import kotlinx.android.synthetic.main.header_navigation.*
 
 
@@ -129,7 +119,7 @@ class MainActivity : AppCompatActivity()
                     modifierTitre(explorer.username.toUpperCase())
                 }
                 R.id.nvmUnits -> {
-                    changeFragment(ListUnitFragment.newInstance(2, explorer.units))
+                    changeFragment(ListUnitFragment.newInstance(explorer.units))
                     modifierTitre(explorer.username.toUpperCase())
                 }
                 R.id.nvmExplorations -> {

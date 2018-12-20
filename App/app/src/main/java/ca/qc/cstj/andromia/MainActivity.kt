@@ -37,7 +37,6 @@ class MainActivity : AppCompatActivity()
         , MapFragment.OnFragmentInteractionListener
         , ListExplorationFragment.OnListFragmentInteractionListener
         , SignupFragment.OnFragmentInteractionListener
-        , PortalNotFoundDialogFragment.PortalNotFoundListener
         , PortalFragment.OnFragmentInteractionListener{
 
     private var explorer = Explorer()
@@ -190,10 +189,6 @@ class MainActivity : AppCompatActivity()
         }
 
         return super.onSupportNavigateUp()
-    }
-
-    override fun onPortalNotFoundPositiveClick(dialog: DialogFragment) {
-        dialog.dismiss()
     }
 
     override fun onPortalScanned(uuid: String, explorer: Explorer) {

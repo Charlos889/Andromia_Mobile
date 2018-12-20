@@ -1,12 +1,10 @@
 package ca.qc.cstj.andromia.fragments
 
 import android.content.Context
-import android.opengl.Visibility
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
-import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -14,14 +12,12 @@ import android.widget.Toast
 import ca.qc.cstj.andromia.EXPLORERS_URL
 import ca.qc.cstj.andromia.R
 import ca.qc.cstj.andromia.adapters.UnitRecyclerViewAdapter
+import ca.qc.cstj.andromia.models.Pagination
 import ca.qc.cstj.andromia.models.Unit
-import com.github.kittinunf.fuel.Fuel
-import com.github.kittinunf.fuel.android.core.Json
-import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.httpGet
+import com.github.kittinunf.fuel.serialization.responseObject
 import kotlinx.android.synthetic.main.fragment_unit_list.*
 import kotlinx.serialization.json.JSON
-import kotlinx.serialization.list
 
 
 /**
@@ -35,12 +31,16 @@ class ListUnitFragment : Fragment() {
 
     private var listener: OnListUnitFragmentInteractionListener? = null
     private var units : MutableList<Unit> = mutableListOf()
+    private var pageNumber : Int = 0
+    private var pageLimit : Int = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         arguments?.let {
             columnCount = it.getInt(ARG_COLUMN_COUNT)
+            pageNumber = it.getInt(ARG_PAGE_NUMBER)
+            pageLimit = it.getInt(ARG_PAGE_LIMIT)
         }
     }
 
@@ -71,15 +71,16 @@ class ListUnitFragment : Fragment() {
         val path = "$EXPLORERS_URL/$username/units"
 
         try {
-            path.httpGet()
+            val parameters = mutableListOf<Pair<String, Int>>()
+            parameters.add(Pair("pageLimit", 8))
+
+            path.httpGet(parameters)
                     .header(mapOf("Authorization" to "Bearer $userToken"))
-                    .responseJson() { _, response, result ->
+                    .responseObject<Pagination<Unit>>(json = JSON(strictMode = false)) { _, response, result ->
                 when (response.statusCode) {
                     200 -> {
                         var lstUnits: List<Unit>
-                        val json = result.get()
-                        val items = json.obj().get("items")
-                        lstUnits = JSON.nonstrict.parse(Unit.serializer().list, items.toString())
+                        lstUnits = result.get().items.subList(,)
 
                         units.clear()
                         units.addAll(lstUnits.toMutableList())
@@ -133,17 +134,20 @@ class ListUnitFragment : Fragment() {
 
     companion object {
 
-        // TODO: Customize parameter argument names
         const val ARG_COLUMN_COUNT = "column-count"
+        const val ARG_PAGE_NUMBER = "page-number"
+        const val ARG_PAGE_LIMIT = "page-limit"
 
         // TODO: Customize parameter initialization
         @JvmStatic
-        fun newInstance(columnCount: Int, units: List<Unit>) =
+        fun newInstance(columnCount: Int, units: List<Unit>, pageNumber : Int = 0, pageLimit : Int = 8) =
                 ListUnitFragment().apply {
                     this.units = units.toMutableList()
 
                     arguments = Bundle().apply {
                         putInt(ARG_COLUMN_COUNT, columnCount)
+                        putInt(ARG_PAGE_NUMBER, pageNumber)
+                        putInt(ARG_PAGE_LIMIT, pageLimit)
                     }
                 }
     }

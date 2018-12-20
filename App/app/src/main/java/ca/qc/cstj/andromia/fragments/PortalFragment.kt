@@ -1,8 +1,6 @@
 package ca.qc.cstj.andromia.fragments
 
 import android.content.Context
-import android.graphics.PointF
-import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.support.v4.app.DialogFragment
@@ -27,7 +25,7 @@ import com.github.kittinunf.fuel.serialization.responseObject
 import kotlinx.android.synthetic.main.fragment_portal.view.*
 import kotlinx.serialization.json.JSON
 
-// TODO: Rename parameter arguments, choose names that match
+
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_UUID = "uuid"
 

@@ -14,13 +14,19 @@ import kotlinx.android.synthetic.main.card_rune.view.*
 
 
 class RunesRecyclerViewAdapter<K, V>(
-        private val Runes: Map<K, V>
+        private val Runes: Map<K, V>,
+        private val smallCard : Boolean
 ) : RecyclerView.Adapter<RunesRecyclerViewAdapter<K, V>.ViewHolder>() {
 
     private val keys = Runes.keys
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
-        val view = LayoutInflater.from(parent.context).inflate(R.layout.card_rune, parent, false)
+        var view : View
+        if(smallCard) {
+            view = LayoutInflater.from(parent.context).inflate(R.layout.card_small_rune, parent, false)
+        } else {
+            view = LayoutInflater.from(parent.context).inflate(R.layout.card_rune, parent, false)
+        }
         return ViewHolder(view)
     }
 

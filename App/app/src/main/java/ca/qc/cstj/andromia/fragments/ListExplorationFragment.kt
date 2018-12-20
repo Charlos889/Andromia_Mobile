@@ -12,6 +12,7 @@ import ca.qc.cstj.andromia.EXPLORATIONS_URL
 import ca.qc.cstj.andromia.R
 import ca.qc.cstj.andromia.adapters.ExplorationRecyclerViewAdapter
 import ca.qc.cstj.andromia.models.Exploration
+import ca.qc.cstj.andromia.models.Pagination
 import ca.qc.cstj.andromia.models.Unit
 import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.httpGet
@@ -54,13 +55,13 @@ class ListExplorationFragment : Fragment() {
         path.httpGet().header(mapOf("Authorization" to "Bearer $userToken")).responseJson { request, response, result ->
             when (response.statusCode) {
                 200 -> {
-                    val lstExplorations: List<Exploration>
+                    val lstExplorations: Pagination<Exploration>?
                     val json = result.get()
-                    val items = json.array()
-                    lstExplorations = JSON.nonstrict.parse(Exploration.serializer().list, items.toString())
+                    val pagination = json.obj()
+                    lstExplorations = JSON.nonstrict.parse(Pagination.serializer(Exploration.serializer()), pagination.toString())
 
                     explorations.clear()
-                    explorations.addAll(lstExplorations.toMutableList())
+                    explorations.addAll(lstExplorations?.items!!)
                 }
             }
         }

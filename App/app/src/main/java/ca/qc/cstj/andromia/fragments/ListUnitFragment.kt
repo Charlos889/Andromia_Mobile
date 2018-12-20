@@ -71,7 +71,9 @@ class ListUnitFragment : Fragment() {
         val path = "$EXPLORERS_URL/$username/units"
 
         try {
-            path.httpGet().header(mapOf("Authorization" to "Bearer $userToken")).responseJson() { _, response, result ->
+            path.httpGet()
+                    .header(mapOf("Authorization" to "Bearer $userToken"))
+                    .responseJson() { _, response, result ->
                 when (response.statusCode) {
                     200 -> {
                         var lstUnits: List<Unit>

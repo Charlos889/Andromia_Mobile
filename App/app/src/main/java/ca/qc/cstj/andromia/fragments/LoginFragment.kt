@@ -8,7 +8,6 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.inputmethod.InputMethodManager
-import android.widget.Toast
 import ca.qc.cstj.andromia.EXPLORERS_URL
 
 import ca.qc.cstj.andromia.R
@@ -16,7 +15,6 @@ import com.andreabaccega.widget.FormEditText
 import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.httpPost
 import kotlinx.android.synthetic.main.fragment_login.*
-import kotlinx.android.synthetic.main.fragment_signup.*
 import org.json.JSONObject
 
 
@@ -97,7 +95,7 @@ class LoginFragment : Fragment() {
 
     private fun onLoginPressed() {
 
-        val allFields = arrayOf<FormEditText>(edtUsernameLogin, edtPasswordLogin)
+        val allFields = arrayOf<FormEditText>(edtUsername, edtPassword)
 
         var allValid = true
         for (field in allFields) {
@@ -114,8 +112,8 @@ class LoginFragment : Fragment() {
 
     private fun login() {
 
-        val username = edtUsernameLogin.text.toString()
-        val password = edtPasswordLogin.text.toString()
+        val username = edtUsername.text.toString()
+        val password = edtPassword.text.toString()
 
         val path = "$EXPLORERS_URL/login"
 
@@ -137,7 +135,9 @@ class LoginFragment : Fragment() {
                     preferences.commit()
                     listener!!.connectionEffecutee()
                 }
-                // TODO : Implémenter les codes d'erreur
+                401 -> {
+                    edtUsername.setError("Either the username or the password you entered is incorrect")
+                }
                 else -> {
                     Log.e("Error", response.toString())
                 }
@@ -145,7 +145,6 @@ class LoginFragment : Fragment() {
         }
 
     }
-
 
     private fun closeKeyboard() {
         val view = this.view

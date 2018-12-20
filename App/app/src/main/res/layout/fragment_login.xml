@@ -8,6 +8,7 @@
     android:orientation="vertical">
 
     <LinearLayout
+        android:id="@+id/linLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
@@ -24,7 +25,7 @@
             android:theme="@style/TextLabel">
 
             <com.andreabaccega.widget.FormEditText
-                android:id="@+id/edtUsernameLogin"
+                android:id="@+id/edtUsername"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:hint="Username or email"
@@ -44,7 +45,7 @@
 
 
             <com.andreabaccega.widget.FormEditText
-                android:id="@+id/edtPasswordLogin"
+                android:id="@+id/edtPassword"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:hint="Password"
@@ -63,15 +64,17 @@
             android:text="Login"
             android:layout_gravity="center_horizontal"/>
 
-        <Button
-            android:id="@+id/btnSignup"
-            android:layout_width="wrap_content"
-            android:layout_height="50dp"
-            android:text="Signup"
-            android:layout_marginTop="50dp"
-            android:layout_marginRight="10dp"
-            android:layout_gravity="bottom|right"/>
-
     </LinearLayout>
+
+    <Button
+        android:id="@+id/btnSignup"
+        android:layout_width="wrap_content"
+        android:layout_height="50dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginBottom="16dp"
+        android:text="Signup"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
 </android.support.constraint.ConstraintLayout>
 

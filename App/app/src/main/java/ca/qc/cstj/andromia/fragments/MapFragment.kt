@@ -4,39 +4,42 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.app.Activity
-import android.support.v4.app.DialogFragment
-import android.app.FragmentManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.graphics.PointF
 import android.os.Bundle
+import android.support.v4.app.DialogFragment
 import android.support.v4.app.Fragment
 import android.support.v4.view.GestureDetectorCompat
 import android.util.DisplayMetrics
+import android.util.Log
 import android.util.TypedValue
 import android.view.*
 import android.widget.Toast
+import ca.qc.cstj.andromia.EXPLORATIONS_URL
 import ca.qc.cstj.andromia.EXPLORERS_URL
-
+import ca.qc.cstj.andromia.PORTALS_URL
 import ca.qc.cstj.andromia.R
 import ca.qc.cstj.andromia.dialogs.CaptureUnitDialogFragment
+import ca.qc.cstj.andromia.dialogs.PortalNotFoundDialogFragment
+import ca.qc.cstj.andromia.models.Exploration
+import ca.qc.cstj.andromia.models.ExplorationBase
 import ca.qc.cstj.andromia.models.Explorer
-import ca.qc.cstj.andromia.models.Runes
-import ca.qc.cstj.andromia.models.Unit
-import ca.qc.cstj.andromia.models.UnitRunes
 import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.httpGet
+import com.github.kittinunf.fuel.httpPost
+import com.github.kittinunf.fuel.serialization.responseObject
 import com.google.zxing.integration.android.IntentIntegrator
-import com.google.zxing.qrcode.encoder.QRCode
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.serialization.json.JSON
-import java.util.*
 
 class MapFragment : Fragment()
                     , GestureDetector.OnGestureListener
-                    , GestureDetector.OnDoubleTapListener {
+                    , GestureDetector.OnDoubleTapListener
+                    , CaptureUnitDialogFragment.CaptureUnitListener{
+
 
     private var positionJoueur = PointF(540f, 361f)
     private var tailleImage = PointF()
@@ -293,9 +296,7 @@ class MapFragment : Fragment()
                 if(result.contents == null) {
                     Toast.makeText(activity, "Cancelled", Toast.LENGTH_LONG).show()
                 } else {
-
-                    val dialog = CaptureUnitDialogFragment.newInstance(Unit("test",0,0,"https://assets.andromia.science/img/units/23.png","", UnitRunes(arrayListOf(String()), arrayListOf(String())),"","",Runes(0,0,0,0,0,0,0,0,0,0,0,0),Date(12345)))
-                    dialog.show(fragmentManager, "Capture")
+                    doExploration(result.contents)
                 }
             } else {
                 super.onActivityResult(requestCode, resultCode, data)
@@ -303,6 +304,63 @@ class MapFragment : Fragment()
         }
     }
 
+    override fun onCapturePositiveClick(dialog: DialogFragment, explorationBase: ExplorationBase?) {
+
+        saveExploration(explorationBase, true)
+        dialog.dismiss()
+    }
+
+    override fun onCaptureNegativeClick(dialog: DialogFragment, explorationBase: ExplorationBase?) {
+
+        saveExploration(explorationBase, false)
+
+        dialog.dismiss()
+    }
+
+
+    private fun doExploration(uuid: String?) {
+
+        val url = "$PORTALS_URL/$uuid"
+        url.httpGet().responseObject<ExplorationBase>(json = JSON(strictMode = false)){ _, response, result ->
+            when(response.statusCode) {
+                200 -> {
+                    val unit = result.get().unit
+                    if(unit.name != null) {
+                        val dialog = CaptureUnitDialogFragment.newInstance(unit, explorerObj, result.get())
+                        dialog.setTargetFragment(this, 0)
+                        dialog.show(fragmentManager, "Capture")
+                    }
+                }
+                404 -> {
+                    val dialog = PortalNotFoundDialogFragment()
+                    dialog.show(fragmentManager, "PortalNotFound")
+                }
+            }
+        }
+    }
+
+    private fun saveExploration(explorationBase: ExplorationBase?, capture : Boolean) {
+        explorationBase!!.capture = capture
+
+        val preferences = activity!!.getSharedPreferences("Andromia", Context.MODE_PRIVATE)
+
+        val userToken = preferences.getString("token", "")
+
+        val jsonExploration = JSON.stringify(ExplorationBase.serializer(), explorationBase)
+        EXPLORATIONS_URL.httpPost()
+                .header(mapOf("Authorization" to "Bearer $userToken"))
+                .jsonBody(jsonExploration)
+                .responseObject<Explorer>(json = JSON(strictMode = false)){ _, response, result ->
+            when(response.statusCode) {
+                201 -> {
+                    listener!!.utilisateurCharge(result.get())
+                }
+                else -> {
+                    Log.d("error", response.toString())
+                }
+            }
+        }
+    }
 
 
     private fun zoomIn(x : Float, y : Float, baseScale : Float) : PointF? {

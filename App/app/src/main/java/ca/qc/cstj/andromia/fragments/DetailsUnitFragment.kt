@@ -50,10 +50,11 @@ class DetailsUnitFragment : Fragment() {
         txvNomUnit.text = unit?.name
         Picasso.with(view.context).load(unit?.imageURL).into(imgDetailUnit)
 
-        val mapRunes : Map<String, Int> = RunesObjectToMap(unit!!.kernel)
+        val mapRunes : Map<String, Int> = RunesObjectToMap(unit!!.kernel!!)
 
         rcvKernel.layoutManager = GridLayoutManager(view.context, 4)
-        rcvKernel.adapter = RunesRecyclerViewAdapter(mapRunes)
+        rcvKernel.adapter = RunesRecyclerViewAdapter(mapRunes, false)
+
     }
 
     fun RunesObjectToMap(runes : Runes) : Map<String, Int> {

@@ -4,10 +4,10 @@ import kotlinx.serialization.Optional
 import kotlinx.serialization.Serializable
 
 @Serializable
-data class Exploration(
-        val depart: PositionExploration?,
-        val destination: PositionExploration,
+class ExplorationBase(
+        val destination: String,
         val runes: Runes,
         val unit: Unit,
         val dateExploration: String,
-        val capture: Boolean) {}
+        @Optional var capture : Boolean? = null) {
+}

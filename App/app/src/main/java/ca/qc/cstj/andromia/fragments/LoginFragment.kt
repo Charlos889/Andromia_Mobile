@@ -16,7 +16,6 @@ import com.andreabaccega.widget.FormEditText
 import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.httpPost
 import kotlinx.android.synthetic.main.fragment_login.*
-import kotlinx.android.synthetic.main.fragment_signup.*
 import org.json.JSONObject
 
 

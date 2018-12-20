@@ -12,8 +12,12 @@ import ca.qc.cstj.andromia.EXPLORATIONS_URL
 import ca.qc.cstj.andromia.R
 import ca.qc.cstj.andromia.adapters.ExplorationRecyclerViewAdapter
 import ca.qc.cstj.andromia.models.Exploration
+import ca.qc.cstj.andromia.models.Unit
 import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.httpGet
+import kotlinx.android.synthetic.main.fragment_unit_list.*
+import kotlinx.serialization.json.JSON
+import kotlinx.serialization.list
 
 /**
  * A fragment representing a list of Items.
@@ -23,7 +27,7 @@ import com.github.kittinunf.fuel.httpGet
 class ListExplorationFragment : Fragment() {
 
     private var listener: OnListFragmentInteractionListener? = null
-    private var explorations : List<Exploration> = mutableListOf()
+    private var explorations : MutableList<Exploration> = mutableListOf()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -42,12 +46,24 @@ class ListExplorationFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        /*val preferences = activity!!.getSharedPreferences("Andromia", Context.MODE_PRIVATE)
+        val preferences = activity!!.getSharedPreferences("Andromia", Context.MODE_PRIVATE)
         val userToken = preferences.getString("token", "")
+        val username = preferences.getString("username", "")
+        val path = "${EXPLORATIONS_URL}/${username}"
 
-        EXPLORATIONS_URL.httpGet().header(mapOf("Authorization" to "Bearer $userToken")).responseJson { request, response, result ->
+        path.httpGet().header(mapOf("Authorization" to "Bearer $userToken")).responseJson { request, response, result ->
+            when (response.statusCode) {
+                200 -> {
+                    val lstExplorations: List<Exploration>
+                    val json = result.get()
+                    val items = json.array()
+                    lstExplorations = JSON.nonstrict.parse(Exploration.serializer().list, items.toString())
 
-        }*/
+                    explorations.clear()
+                    explorations.addAll(lstExplorations.toMutableList())
+                }
+            }
+        }
     }
 
     override fun onAttach(context: Context) {
@@ -78,7 +94,7 @@ class ListExplorationFragment : Fragment() {
         @JvmStatic
         fun newInstance(explorations : List<Exploration>) = ListExplorationFragment().apply {
 
-            this.explorations = explorations
+            this.explorations = explorations.toMutableList()
 
         }
     }

@@ -71,7 +71,7 @@ class SignupFragment : Fragment() {
             }
 
             // Check for password and password confirmation integrity
-            if(field == edtPasswordRepeatSignup && edtPasswordSignup.text != edtPasswordRepeatSignup.text) {
+            if(field == edtPasswordRepeatSignup && edtPasswordSignup.text.toString() != edtPasswordRepeatSignup.text.toString()) {
                 field.setError("There is a mismatch between your password and the confirmation")
                 allValid = false
             }

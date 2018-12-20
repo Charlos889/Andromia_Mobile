@@ -4,13 +4,17 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
 import ca.qc.cstj.andromia.R
 
 
 import ca.qc.cstj.andromia.fragments.ListExplorationFragment.OnListFragmentInteractionListener
 import ca.qc.cstj.andromia.models.Exploration
+import com.squareup.picasso.Picasso
+import jp.wasabeef.picasso.transformations.GrayscaleTransformation
 import kotlinx.android.synthetic.main.card_exploration.view.*
+import java.text.SimpleDateFormat
 
 /**
  * [RecyclerView.Adapter] that can display a [DummyItem] and makes a call to the
@@ -41,17 +45,34 @@ class ExplorationRecyclerViewAdapter(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val item = mValues[position]
-        holder.mIdView.text = item.id
 
-        with(holder.mView) {
-            tag = item
-            setOnClickListener(mOnClickListener)
+        with(holder) {
+            view.tag = item
+            view.setOnClickListener(mOnClickListener)
+            bind(item)
         }
     }
 
     override fun getItemCount(): Int = mValues.size
 
-    inner class ViewHolder(val mView: View) : RecyclerView.ViewHolder(mView) {
-        val mIdView: TextView = mView.txtExploration
+    inner class ViewHolder(val view: View) : RecyclerView.ViewHolder(view) {
+        val txtDestination : TextView = view.txtDestination
+        val txtDateExploration : TextView = view.txtDateExploration
+        val imgUnitExploration : ImageView = view.imgUnitExploration
+
+        fun bind(exploration : Exploration) {
+            val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
+
+            txtDestination.text = "${txtDestination.text}${exploration.destination.nom}"
+            txtDateExploration.text = "${txtDateExploration.text}${dateFormat.format(exploration.dateExploration)}"
+
+            if (exploration.unit != null) {
+                if (exploration.capture) {
+                    Picasso.with(view.context).load(exploration.unit.imageURL).into(imgUnitExploration)
+                } else {
+                    Picasso.with(view.context).load(exploration.unit.imageURL).transform(GrayscaleTransformation()).into(imgUnitExploration)
+                }
+            }
+        }
     }
 }

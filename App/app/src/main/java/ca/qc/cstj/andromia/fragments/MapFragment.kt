@@ -4,6 +4,8 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.app.Activity
+import android.support.v4.app.DialogFragment
+import android.app.FragmentManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
@@ -34,6 +36,8 @@ import com.github.kittinunf.fuel.serialization.responseObject
 import com.google.zxing.integration.android.IntentIntegrator
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.serialization.json.JSON
+import java.lang.Exception
+import java.util.*
 
 class MapFragment : Fragment()
                     , GestureDetector.OnGestureListener
@@ -100,19 +104,33 @@ class MapFragment : Fragment()
 
                     when (response.statusCode) {
                         200 -> {
-                            val json = result.get()
-                            val explorer = json.obj()
-                            explorerObj = JSON.nonstrict.parse(Explorer.serializer(), explorer.toString())
+                            try {
+                                val json = result.get()
+                                val explorer = json.obj()
+                                explorerObj = JSON.nonstrict.parse(Explorer.serializer(), explorer.toString())
 
-                            if (explorerObj!!.explorations.isNotEmpty()) {
-                                val posJoueur = explorerObj!!.explorations.last().destination.coordonnees
+                                if (explorerObj!!.explorations.isNotEmpty()) {
+                                    val posJoueur = explorerObj!!.explorations.last().destination.coordonnees
 
-                                positionJoueur = PointF(posJoueur.x.toFloat(), posJoueur.y.toFloat())
+                                    positionJoueur = PointF(posJoueur.x.toFloat(), posJoueur.y.toFloat())
 
-                                positionnerBouton()
+                                    positionnerBouton()
+                                }
+
+                                listener!!.utilisateurCharge(explorerObj!!)
+                            } catch (e : Exception) {
+                                e.printStackTrace()
                             }
-
-                            listener!!.utilisateurCharge(explorerObj!!)
+                        }
+                        else -> {
+                            // Si le serveur ferme pendant que l'utilisateur utilise l'application,
+                            // on veut l'avertir du problème, sans nécessairement le bloquer d'utiliser l'application
+                            // Sinon, on le déconnecte (ça sert à rien de le laisser continuer, on n'a pas ses infos)
+                            if (listener!!.utilisateurExistant()) {
+                                Toast.makeText(this.context, "Une erreur est survenue...", Toast.LENGTH_LONG).show()
+                            } else {
+                                listener!!.retourLogin()
+                            }
                         }
                     }
                 }
@@ -432,6 +450,8 @@ class MapFragment : Fragment()
     interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         fun utilisateurCharge(utilisateur: Explorer)
+        fun utilisateurExistant() : Boolean
+        fun retourLogin()
     }
 
     companion object {

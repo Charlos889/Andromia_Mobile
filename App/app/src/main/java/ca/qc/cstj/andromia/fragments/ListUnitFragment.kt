@@ -60,12 +60,15 @@ class ListUnitFragment : Fragment() {
         }
         rcvUnits.adapter = UnitRecyclerViewAdapter(units, listener, activity)
 
+        if(units.size == 0) {
+            txvNoUnit.visibility = View.VISIBLE
+        }
 
         val preferences = activity!!.getSharedPreferences("Andromia", Context.MODE_PRIVATE)
 
         val userToken = preferences.getString("token", "")
         val username = preferences.getString("username", "")
-        val path : String = "$EXPLORERS_URL/$username/units"
+        val path = "$EXPLORERS_URL/$username/units"
 
         try {
             path.httpGet()
@@ -86,9 +89,10 @@ class ListUnitFragment : Fragment() {
                             txvNoUnit.visibility = View.VISIBLE
                         }
                     }
-                    else -> {
-                        Toast.makeText(activity, "Le serveur est présentement inaccessible..", Toast.LENGTH_LONG).show()
-                    }
+                    // Ici, on  ne gère pas les codes d'erreurs, car comme on passe la liste des units de l'explorer
+                    // dans le constructeur, cette requête ne permet que d'updater la liste, donc même s'il y a une erreur,
+                    // on pourra quand même afficher une liste, donc afficher l'erreur semble inutile. (Si c'est que le serveur
+                    // est down, il obtiendra l'erreur en revenant au menu principal)
                 }
             }
         } catch (e : Exception) {
@@ -132,8 +136,10 @@ class ListUnitFragment : Fragment() {
 
         // TODO: Customize parameter initialization
         @JvmStatic
-        fun newInstance(columnCount: Int) =
+        fun newInstance(columnCount: Int, units: List<Unit>) =
                 ListUnitFragment().apply {
+                    this.units = units.toMutableList()
+
                     arguments = Bundle().apply {
                         putInt(ARG_COLUMN_COUNT, columnCount)
                     }

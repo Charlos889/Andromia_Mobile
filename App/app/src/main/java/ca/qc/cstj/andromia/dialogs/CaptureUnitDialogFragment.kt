@@ -4,11 +4,17 @@ import android.app.AlertDialog
 import android.app.Dialog
 import android.support.v4.app.DialogFragment
 import android.content.Context
+import android.graphics.Color
+import android.graphics.Typeface.BOLD
 import android.os.Bundle
+import android.support.annotation.Dimension.SP
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
 import android.widget.ImageView
+import android.widget.TextView
 import ca.qc.cstj.andromia.R
 import ca.qc.cstj.andromia.adapters.RunesRecyclerViewAdapter
 import ca.qc.cstj.andromia.models.ExplorationBase
@@ -46,37 +52,30 @@ class CaptureUnitDialogFragment : DialogFragment() {
         super.onCreate(savedInstanceState)
 
         try {
-            listener = targetFragment as CaptureUnitListener
+            listener = parentFragment as CaptureUnitListener
         } catch (e : ClassCastException) {
             throw ClassCastException("Calling fragment must implement CaptureUnitListener")
         }
     }
-
-    /*override fun onAttach(context: Context?) {
-        super.onAttach(context)
-
-        try {
-            mListener = context as CaptureUnitListener
-        } catch (e : ClassCastException) {
-            throw ClassCastException((context.toString() + "must implement CaptureDialogListener"))
-        }
-    }*/
 
     override fun onCreateDialog(savedInstanceState: Bundle?): Dialog {
         return activity?.let {
             val builder = AlertDialog.Builder(it)
 
             val view = activity!!.layoutInflater.inflate(R.layout.dialog_exploration, null)
+            val titleView = activity!!.layoutInflater.inflate(R.layout.txv_custom_title, null) as TextView
 
             setViewContent(view)
             val canCapture = checkIfCapturePossible()
             val title = if(canCapture) {
-                "Do you want to catch ${unit!!.name} ?"
+                "You found ${unit!!.name}! Do you want to catch it?"
             } else {
-                "Unfortunately, you can't catch ${unit!!.name}.."
+                "You found ${unit!!.name} while traveling, but you don't have enough runes to catch it.."
             }
 
-            builder.setTitle(title).setView(view)
+            titleView.text = title
+
+            builder.setCustomTitle(titleView).setView(view)
             if(canCapture) {
                 builder.setPositiveButton("Yes", {dialog, id ->
                             listener!!.onCapturePositiveClick(this, exploration)
@@ -105,9 +104,9 @@ class CaptureUnitDialogFragment : DialogFragment() {
 
         Picasso.with(view.context).load(unit!!.imageURL).into(imgUnitDialog)
 
-        rcvKernel.layoutManager = GridLayoutManager(activity, 6)
+        rcvKernel.layoutManager = GridLayoutManager(view.context, 6)
         rcvKernel.adapter = RunesRecyclerViewAdapter(mapRunesKernel, true)
-        rcvRunesExplorer.layoutManager = GridLayoutManager(activity, 6)
+        rcvRunesExplorer.layoutManager = GridLayoutManager(view.context, 6)
         rcvRunesExplorer.adapter = RunesRecyclerViewAdapter(mapRunesExplorer, true)
 
         txvLife.text = "${txvLife.text}${unit!!.life.toString()}"

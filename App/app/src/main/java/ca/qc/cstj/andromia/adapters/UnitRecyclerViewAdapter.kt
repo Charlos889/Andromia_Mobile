@@ -1,6 +1,6 @@
 package ca.qc.cstj.andromia.adapters
 
-import android.app.Activity
+
 import android.support.v4.app.FragmentActivity
 import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
@@ -9,22 +9,19 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import ca.qc.cstj.andromia.R
-
-
-import ca.qc.cstj.andromia.fragments.ListUnitFragment.OnListFragmentInteractionListener
-
+import ca.qc.cstj.andromia.fragments.ListExplorationFragment
+import ca.qc.cstj.andromia.fragments.ListUnitFragment
 import kotlinx.android.synthetic.main.card_unit.view.*
 import ca.qc.cstj.andromia.models.Unit
 import com.squareup.picasso.Picasso
 
 /**
  * [RecyclerView.Adapter] that can display a [Unit] and makes a call to the
- * specified [OnListFragmentInteractionListener].
- * TODO: Replace the implementation with code for your data type.
+ * specified [OnListUnitFragmentInteractionListener].
  */
 class UnitRecyclerViewAdapter(
         private val Values: List<Unit>,
-        private val Listener: OnListFragmentInteractionListener?,
+        private val Listener: ListUnitFragment.OnListUnitFragmentInteractionListener?,
         private val activity : FragmentActivity?)
     : RecyclerView.Adapter<UnitRecyclerViewAdapter.ViewHolder>() {
 
@@ -35,7 +32,7 @@ class UnitRecyclerViewAdapter(
             val item = v.tag as Unit
             // Notify the active callbacks interface (the activity, if the fragment is attached to
             // one) that an item has been selected.
-            Listener?.onListFragmentInteraction(item)
+            Listener?.onListUnitFragmentInteraction(item)
         }
     }
 

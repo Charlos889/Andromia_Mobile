@@ -32,7 +32,7 @@ class ListUnitFragment : Fragment() {
     private var listener: OnListUnitFragmentInteractionListener? = null
     private var units : MutableList<Unit> = mutableListOf()
     private var pageNumber : Int = 0
-    private var pageLimit : Int = 0
+    private var pageLimit : Int = 8
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -79,11 +79,9 @@ class ListUnitFragment : Fragment() {
                     .responseObject<Pagination<Unit>>(json = JSON(strictMode = false)) { _, response, result ->
                 when (response.statusCode) {
                     200 -> {
-                        var lstUnits: List<Unit>
-                        lstUnits = result.get().items.subList(,)
-
                         units.clear()
-                        units.addAll(lstUnits.toMutableList())
+                        units = result.get().items.subList(pageNumber*pageLimit, pageLimit).toMutableList()
+
                         if (units.size > 0) {
                             rcvUnits.adapter.notifyDataSetChanged()
                             txvNoUnit.visibility = View.GONE

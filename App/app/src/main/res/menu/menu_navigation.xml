@@ -13,6 +13,7 @@
             android:title="Units" />
         <item
             android:id="@+id/nvmExplorations"
+            android:icon="@drawable/treasure"
             android:title="Explorations"
             />
     </group>

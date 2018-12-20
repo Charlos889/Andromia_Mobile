@@ -1,13 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/rcvExplorations"
-    android:name="ca.qc.cstj.andromia.fragments.ListExplorationFragment"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_marginLeft="16dp"
-    android:layout_marginRight="16dp"
-    app:layoutManager="LinearLayoutManager"
-    tools:context=".fragments.ListExplorationFragment"
-    tools:listitem="@layout/card_exploration" />
+<android.support.constraint.ConstraintLayout
+xmlns:android="http://schemas.android.com/apk/res/android"
+android:layout_width="match_parent"
+android:layout_height="match_parent">
+
+    <android.support.v7.widget.RecyclerView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/rcvExplorations"
+        android:name="ca.qc.cstj.andromia.fragments.ListExplorationFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="16dp"
+        android:layout_marginRight="16dp"
+        app:layoutManager="LinearLayoutManager"
+        tools:context=".fragments.ListExplorationFragment"
+        tools:listitem="@layout/card_exploration" />
+
+    <TextView
+        android:id="@+id/txvNoExploration"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_margin="10dp"
+        android:text="Vous n'avez fait auncune exploration pour l'instant.."
+        android:textSize="26sp"
+        android:textColor="@android:color/black"
+        android:visibility="gone"/>
+
+</android.support.constraint.ConstraintLayout>

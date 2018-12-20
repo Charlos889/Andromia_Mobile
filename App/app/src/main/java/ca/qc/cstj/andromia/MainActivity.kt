@@ -97,17 +97,19 @@ class MainActivity : AppCompatActivity()
     }
 
     override fun retourLogin() {
-        progressDialog?.dismiss()
-        progressDialog = null
+        avertirDeconnexion()
+    }
 
-        val alert = AlertDialog.Builder(this)
+    override fun deconnexionListExploration() {
+        avertirDeconnexion()
+    }
 
-        alert.setTitle("Une erreur est survenue")
-        alert.setMessage("Veuillez réessayer plus tard")
-        alert.setNeutralButton("OK") { dialog, which ->
-            logout()
-        }
-        alert.show()
+    override fun deconnexionListUnit() {
+        avertirDeconnexion()
+    }
+
+    override fun deconnexionPortal() {
+        avertirDeconnexion()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -130,7 +132,7 @@ class MainActivity : AppCompatActivity()
                     modifierTitre(explorer.username.toUpperCase())
                 }
                 R.id.nvmUnits -> {
-                    changeFragment(ListUnitFragment.newInstance(2, explorer.units))
+                    changeFragment(ListUnitFragment.newInstance(2, listOf()))
                     modifierTitre(explorer.username.toUpperCase())
                 }
                 R.id.nvmExplorations -> {
@@ -188,6 +190,7 @@ class MainActivity : AppCompatActivity()
 
                 modifierReturnButton(fragment)
                 modifierMenuOptions(fragment)
+                modifierNavigationDrawer(fragment)
             }
         }
 
@@ -299,6 +302,20 @@ class MainActivity : AppCompatActivity()
                 supportActionBar!!.setHomeAsUpIndicator(R.drawable.ic_arrow_back)
             }
         }
+    }
+
+    private fun avertirDeconnexion() {
+        progressDialog?.dismiss()
+        progressDialog = null
+
+        val alert = AlertDialog.Builder(this)
+
+        alert.setTitle("Une erreur est survenue")
+        alert.setMessage("Veuillez vous reconnecter")
+        alert.setNeutralButton("OK") { dialog, which ->
+            logout()
+        }
+        alert.show()
     }
 
     private fun logout() {

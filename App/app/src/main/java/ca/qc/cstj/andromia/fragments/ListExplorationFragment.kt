@@ -131,6 +131,10 @@ class ListExplorationFragment : Fragment() {
                     }
                     isLoading = false
                 }
+                // Le token a expired
+                401 -> {
+                    listener!!.deconnexionListExploration()
+                }
             }
         }
     }
@@ -146,6 +150,7 @@ class ListExplorationFragment : Fragment() {
     interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
         fun onListExplorationFragmentInteraction(item: Exploration?)
+        fun deconnexionListExploration()
     }
 
     companion object {

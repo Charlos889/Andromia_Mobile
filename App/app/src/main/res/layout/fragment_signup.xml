@@ -23,7 +23,7 @@
             android:theme="@style/TextLabel">
 
             <com.andreabaccega.widget.FormEditText
-                android:id="@+id/edtUsernameSignup"
+                android:id="@+id/edtUsername"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:hint="@string/username"
@@ -44,7 +44,7 @@
             >
 
             <com.andreabaccega.widget.FormEditText
-                android:id="@+id/edtEmailSignup"
+                android:id="@+id/edtEmail"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:hint="@string/email"
@@ -65,7 +65,7 @@
             android:theme="@style/TextLabel"
             >
             <com.andreabaccega.widget.FormEditText
-                android:id="@+id/edtPasswordSignup"
+                android:id="@+id/edtPassword"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:hint="@string/password"
@@ -86,7 +86,7 @@
             android:theme="@style/TextLabel"
             >
             <com.andreabaccega.widget.FormEditText
-                android:id="@+id/edtPasswordRepeatSignup"
+                android:id="@+id/edtPasswordRepeat"
                 android:layout_width="match_parent"
                 android:layout_height="60dp"
                 android:hint="@string/passwordRepeat"

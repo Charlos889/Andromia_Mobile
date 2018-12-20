@@ -15,6 +15,7 @@ import android.util.Log
 import android.view.MenuItem
 import android.widget.Toast
 import ca.qc.cstj.andromia.dialogs.CaptureUnitDialogFragment
+import ca.qc.cstj.andromia.dialogs.PortalNotFoundDialogFragment
 import ca.qc.cstj.andromia.fragments.*
 import ca.qc.cstj.andromia.models.Exploration
 import ca.qc.cstj.andromia.models.Explorer
@@ -29,7 +30,7 @@ class MainActivity : AppCompatActivity()
         , MapFragment.OnFragmentInteractionListener
         , ListExplorationFragment.OnListFragmentInteractionListener
         , SignupFragment.OnFragmentInteractionListener
-        , CaptureUnitDialogFragment.CaptureUnitListener{
+        , PortalNotFoundDialogFragment.PortalNotFoundListener{
 
     private var explorer = Explorer()
     private var menuOuvert = false
@@ -40,6 +41,8 @@ class MainActivity : AppCompatActivity()
     }
 
     override fun onSignupFragmentInteraction() {
+        supportFragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+
         changeFragment(MapFragment.newInstance(), false)
 
         progressDialog = ProgressDialog(this)
@@ -175,14 +178,6 @@ class MainActivity : AppCompatActivity()
         return super.onSupportNavigateUp()
     }
 
-    override fun onDialogPositiveClick(dialog: DialogFragment) {
-        Toast.makeText(this, "Oui", Toast.LENGTH_LONG).show()
-    }
-
-    override fun onDialogNegativeClick(dialog: DialogFragment) {
-        Toast.makeText(this, "Non", Toast.LENGTH_LONG).show()
-    }
-
     private fun changeFragment(newFragment : Fragment, saveInBackstack : Boolean = true, animate:Boolean = true, tag:String = newFragment.javaClass.name) {
 
         try {
@@ -262,5 +257,9 @@ class MainActivity : AppCompatActivity()
         supportFragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
         modifierTitre("Andromia")
         changeFragment(LoginFragment.newInstance(), false)
+    }
+
+    override fun onPortalNotFoundPositiveClick(dialog: DialogFragment) {
+        dialog.dismiss()
     }
 }

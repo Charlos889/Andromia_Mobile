@@ -15,6 +15,8 @@ import com.andreabaccega.widget.FormEditText
 import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.httpPost
 import kotlinx.serialization.ImplicitReflectionSerializer
+import kotlinx.serialization.json.JsonObject
+import org.json.JSONObject
 
 
 /**
@@ -40,7 +42,6 @@ class SignupFragment : Fragment() {
         return inflater.inflate(R.layout.fragment_signup, container, false)
     }
 
-    @ImplicitReflectionSerializer
     override fun onStart() {
         super.onStart()
 
@@ -52,37 +53,54 @@ class SignupFragment : Fragment() {
 
     private fun onSignupPressed() {
 
-        val allFields = arrayOf<FormEditText>(edtUsernameSignup, edtEmailSignup, edtPasswordSignup, edtPasswordRepeatSignup)
+        val allFields = arrayOf<FormEditText>(edtUsername, edtEmail, edtPassword, edtPasswordRepeat)
 
         var allValid = true
         for (field in allFields) {
             allValid = field.testValidity() && allValid
 
             // Check for username max length
-            if(field == edtUsernameSignup && field.text.length > 25) {
+            if(field == edtUsername && field.text.length > 25) {
                 field.setError("Your username must not exceed 25 characters")
                 allValid = false
             }
 
             // Check for username min length
-            if(field == edtUsernameSignup && field.text.length < 3) {
+            if(field == edtUsername && field.text.length < 3) {
                 field.setError("Your username must have at least 3 characters")
                 allValid = false
             }
 
             // Check for password and password confirmation integrity
-            if(field == edtPasswordRepeatSignup && edtPasswordSignup.text.toString() != edtPasswordRepeatSignup.text.toString()) {
+            if(field == edtPasswordRepeat && edtPassword.text.toString() != edtPasswordRepeat.text.toString()) {
                 field.setError("There is a mismatch between your password and the confirmation")
                 allValid = false
             }
         }
 
         if (allValid) {
-            val InfosUser : String = """{"username":"${edtUsernameSignup.text}","email":"${edtEmailSignup.text}","password":"${edtPasswordSignup.text}"}"""
-            EXPLORERS_URL.httpPost().jsonBody(InfosUser).responseJson{request, response, result ->
+            val InfosUser : String = """{"username":"${edtUsername.text}","email":"${edtEmail.text}","password":"${edtPassword.text}"}"""
+            EXPLORERS_URL.httpPost().jsonBody(InfosUser).responseJson{_, response, result ->
                 when(response.statusCode) {
                     201 -> {
-                        val json = result.get()
+                        // Sauvegarder les infos dans les SharedPreferences
+                        val jsonResult = result.get()
+                        val preferences = activity!!.getSharedPreferences("Andromia", Context.MODE_PRIVATE).edit()
+
+                        preferences.putString("token", jsonResult.obj().get("token").toString())
+                        preferences.putString("username", edtUsername.text.toString())
+                        // Le commit est utile pour conserver l'information des SharedPreferences en cas d'app crash (autrement, avec apply, on les perdait)
+                        preferences.commit()
+
+                        listener!!.onSignupFragmentInteraction()
+                    }
+                    403 -> {
+                        val errorData = JSONObject(String(response.data))
+                        val errorMessage  = errorData["message"] as String
+                        if(errorMessage != null && errorMessage == "username")
+                            edtUsername.setError("This username is already taken")
+                        else if(errorMessage != null && errorMessage == "email")
+                            edtEmail.setError("This email address is already taken")
                     }
                     else -> {
                         Toast.makeText(activity,"${response.statusCode}, ${response.responseMessage}", Toast.LENGTH_LONG).show()
@@ -121,7 +139,6 @@ class SignupFragment : Fragment() {
      * for more information.
      */
     interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         fun onSignupFragmentInteraction()
     }
 
@@ -132,10 +149,8 @@ class SignupFragment : Fragment() {
          *
          * @return A new instance of fragment SignupFragment.
          */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance() =
-                SignupFragment()
+        fun newInstance() = SignupFragment()
     }
 
     private fun closeKeyboard() {

@@ -7,6 +7,7 @@ import android.support.v4.app.DialogFragment
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.RecyclerView
 import android.view.View
+import android.widget.TextView
 import ca.qc.cstj.andromia.R
 import ca.qc.cstj.andromia.adapters.RunesRecyclerViewAdapter
 import ca.qc.cstj.andromia.dialogs.RunesFoundDialogFragment.Companion.runes
@@ -20,9 +21,11 @@ class RunesFoundDialogFragment : DialogFragment() {
 
     companion object {
         var runes : Runes? = null
+        var destination : String? = null
 
-        fun newInstance(runes : Runes?) : DialogFragment {
+        fun newInstance(runes : Runes?, destination : String?) : DialogFragment {
             this.runes = runes
+            this.destination = destination
             return RunesFoundDialogFragment()
         }
     }
@@ -40,7 +43,7 @@ class RunesFoundDialogFragment : DialogFragment() {
         try {
             listener = targetFragment as RunesFoundInteractionListener
         } catch (e : ClassCastException) {
-            throw ClassCastException("Calling fragment must implement CaptureUnitListener")
+            throw ClassCastException("Calling fragment must implement RunesFoundInteractionListener")
         }
     }
 
@@ -54,9 +57,9 @@ class RunesFoundDialogFragment : DialogFragment() {
 
             val runesFound = checkIfRunesFound()
             val title = if(runesFound) {
-                "You found some runes while traveling !"
+                "You arrived at $destination. You found some runes while traveling !"
             } else {
-                "Unfortunately, you found no runes while traveling.."
+                "You arrived at $destination. You found no runes while traveling.."
             }
 
             if(runesFound)

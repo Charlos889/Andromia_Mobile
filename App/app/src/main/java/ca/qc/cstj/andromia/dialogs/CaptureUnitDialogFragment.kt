@@ -52,7 +52,7 @@ class CaptureUnitDialogFragment : DialogFragment() {
         super.onCreate(savedInstanceState)
 
         try {
-            listener = targetFragment as CaptureUnitListener
+            listener = parentFragment as CaptureUnitListener
         } catch (e : ClassCastException) {
             throw ClassCastException("Calling fragment must implement CaptureUnitListener")
         }

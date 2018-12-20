@@ -3,6 +3,7 @@ package ca.qc.cstj.andromia
 import android.app.ProgressDialog
 import android.content.Context
 import android.content.DialogInterface
+import android.net.Uri
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.app.DialogFragment
@@ -36,7 +37,8 @@ class MainActivity : AppCompatActivity()
         , MapFragment.OnFragmentInteractionListener
         , ListExplorationFragment.OnListFragmentInteractionListener
         , SignupFragment.OnFragmentInteractionListener
-        , PortalNotFoundDialogFragment.PortalNotFoundListener{
+        , PortalNotFoundDialogFragment.PortalNotFoundListener
+        , PortalFragment.OnFragmentInteractionListener{
 
     private var explorer = Explorer()
     private var menuOuvert = false
@@ -193,6 +195,15 @@ class MainActivity : AppCompatActivity()
     override fun onPortalNotFoundPositiveClick(dialog: DialogFragment) {
         dialog.dismiss()
     }
+
+    override fun onPortalScanned(uuid: String, explorer: Explorer) {
+        changeFragment(PortalFragment.newInstance(uuid, explorer), false)
+    }
+
+    override fun onExplorationDone() {
+        changeFragment(MapFragment.newInstance(), false)
+    }
+
 
     private fun changeFragment(newFragment : Fragment, saveInBackstack : Boolean = true, animate:Boolean = true, tag:String = newFragment.javaClass.name) {
 

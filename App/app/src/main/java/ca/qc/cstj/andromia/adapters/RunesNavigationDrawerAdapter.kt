@@ -40,8 +40,19 @@ class RunesNavigationDrawerAdapter<K, V>(
         val txtQuantity : TextView = view.txtQuantityRuneNavigation
 
         fun bind(pair : Pair<K, V>) {
-            txtQuantity.text = pair.second.toString()
+            val quantite = obtenirQuantite(pair.second)
+            // Pour éviter d'un problème de layout qui se produirait si on avait 4+ caractères, j'ai décidé de stopper à 99 pour le décompte
+            if (quantite > 99) {
+                txtQuantity.text = "99+"
+            } else {
+                txtQuantity.text = quantite.toString()
+            }
+
             Picasso.with(view.context).load("$DRAWABLE_PATH${pair.first.toString()}").into(imgRune)
+        }
+
+        private fun obtenirQuantite(nombre : V) : Int {
+            return nombre.toString().toInt()
         }
     }
 }

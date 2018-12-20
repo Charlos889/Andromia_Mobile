@@ -16,11 +16,6 @@ import jp.wasabeef.picasso.transformations.GrayscaleTransformation
 import kotlinx.android.synthetic.main.card_exploration.view.*
 import java.text.SimpleDateFormat
 
-/**
- * [RecyclerView.Adapter] that can display a [DummyItem] and makes a call to the
- * specified [OnListFragmentInteractionListener].
- * TODO: Replace the implementation with code for your data type.
- */
 class ExplorationRecyclerViewAdapter(
         private val mValues: List<Exploration>,
         private val mListener: OnListFragmentInteractionListener?)
@@ -63,10 +58,11 @@ class ExplorationRecyclerViewAdapter(
         fun bind(exploration : Exploration) {
             val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
 
-            txtDestination.text = "${txtDestination.text}${exploration.destination.nom}"
-            txtDateExploration.text = "${txtDateExploration.text}${dateFormat.format(exploration.dateExploration)}"
+            txtDestination.text = "Destination : ${exploration.destination.nom}"
+            txtDateExploration.text = "Date : ${dateFormat.format(exploration.dateExploration)}"
 
             if (exploration.unit != null) {
+                // Si on n'a pas capturé la unit, on veut l'afficher en gris, pour démontrer à l'utilisateur qu'il ne l'a pas capturé
                 if (exploration.capture) {
                     Picasso.with(view.context).load(exploration.unit.imageURL).into(imgUnitExploration)
                 } else {

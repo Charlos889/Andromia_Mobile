@@ -55,13 +55,12 @@ class ListExplorationFragment : Fragment() {
         path.httpGet().header(mapOf("Authorization" to "Bearer $userToken")).responseJson { request, response, result ->
             when (response.statusCode) {
                 200 -> {
-                    val lstExplorations: Pagination<Exploration>?
                     val json = result.get()
                     val pagination = json.obj()
-                    lstExplorations = JSON.nonstrict.parse(Pagination.serializer(Exploration.serializer()), pagination.toString())
+                    val lstExplorations = JSON.nonstrict.parse(Pagination.serializer(Exploration.serializer()), pagination.toString())
 
                     explorations.clear()
-                    explorations.addAll(lstExplorations?.items!!)
+                    explorations.addAll(lstExplorations.items!!)
                 }
             }
         }

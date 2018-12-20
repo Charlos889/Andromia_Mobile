@@ -25,7 +25,7 @@ import kotlinx.android.synthetic.main.header_navigation.*
 
 
 class MainActivity : AppCompatActivity()
-        , ListUnitFragment.OnListFragmentInteractionListener
+        , ListUnitFragment.OnListUnitFragmentInteractionListener
         , LoginFragment.OnFragmentInteractionListener
         , MapFragment.OnFragmentInteractionListener
         , ListExplorationFragment.OnListFragmentInteractionListener
@@ -36,8 +36,9 @@ class MainActivity : AppCompatActivity()
     private var menuOuvert = false
     private var progressDialog : ProgressDialog? = null
 
-    override fun onListFragmentInteraction(unit: Unit?) {
-        changeFragment(DetailsUnitFragment.newInstance(unit))
+    override fun onListUnitFragmentInteraction(unit: Unit?) {
+        if(unit != null)
+            changeFragment(DetailsUnitFragment.newInstance(unit))
     }
 
     override fun onSignupFragmentInteraction() {

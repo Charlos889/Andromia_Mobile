@@ -24,8 +24,10 @@ import ca.qc.cstj.andromia.PORTALS_URL
 import ca.qc.cstj.andromia.R
 import ca.qc.cstj.andromia.dialogs.CaptureUnitDialogFragment
 import ca.qc.cstj.andromia.dialogs.PortalNotFoundDialogFragment
+import ca.qc.cstj.andromia.dialogs.RunesFoundDialogFragment
 import ca.qc.cstj.andromia.models.ExplorationBase
 import ca.qc.cstj.andromia.models.Explorer
+import ca.qc.cstj.andromia.models.Runes
 import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.httpPost
@@ -38,8 +40,8 @@ import java.lang.Exception
 class MapFragment : Fragment()
                     , GestureDetector.OnGestureListener
                     , GestureDetector.OnDoubleTapListener
-                    , CaptureUnitDialogFragment.CaptureUnitListener{
-
+                    , CaptureUnitDialogFragment.CaptureUnitListener
+                    , RunesFoundDialogFragment.RunesFoundInteractionListener{
 
     private var positionJoueur = PointF(540f, 361f)
     private var tailleImage = PointF()
@@ -320,14 +322,29 @@ class MapFragment : Fragment()
 
     override fun onCapturePositiveClick(dialog: DialogFragment, explorationBase: ExplorationBase?) {
 
-        saveExploration(explorationBase, true)
         dialog.dismiss()
+
+        val dialogRunes = RunesFoundDialogFragment.newInstance(explorationBase!!.runes)
+        dialogRunes.setTargetFragment(this, 0)
+        dialogRunes.isCancelable = false
+        dialogRunes.show(fragmentManager, "RunesFound")
+
+        saveExploration(explorationBase, true)
     }
 
     override fun onCaptureNegativeClick(dialog: DialogFragment, explorationBase: ExplorationBase?) {
 
-        saveExploration(explorationBase, false)
+        dialog.dismiss()
 
+        val dialogRunes = RunesFoundDialogFragment.newInstance(explorationBase!!.runes)
+        dialogRunes.setTargetFragment(this, 0)
+        dialogRunes.isCancelable = false
+        dialogRunes.show(fragmentManager, "RunesFound")
+
+        saveExploration(explorationBase, false)
+    }
+
+    override fun onRunesNegativeClick(dialog: DialogFragment) {
         dialog.dismiss()
     }
 
@@ -338,11 +355,21 @@ class MapFragment : Fragment()
         url.httpGet().responseObject<ExplorationBase>(json = JSON(strictMode = false)){ _, response, result ->
             when(response.statusCode) {
                 200 -> {
-                    val unit = result.get().unit
-                    if(unit.name != null) {
-                        val dialog = CaptureUnitDialogFragment.newInstance(unit, explorerObj, result.get())
+                    val explorationRespose = result.get()
+
+                    if(explorationRespose.unit.name != null) {
+
+                        val dialog = CaptureUnitDialogFragment.newInstance(explorationRespose.unit, explorerObj, result.get())
                         dialog.setTargetFragment(this, 0)
+                        dialog.isCancelable = false
                         dialog.show(fragmentManager, "Capture")
+
+                    } else if (checkIfRunesFound(explorationRespose.runes)) {
+
+                        val dialog = RunesFoundDialogFragment.newInstance(explorationRespose.runes)
+                        dialog.setTargetFragment(this, 0)
+                        dialog.isCancelable = false
+                        dialog.show(fragmentManager, "RunesFound")
                     }
                 }
                 404 -> {
@@ -381,6 +408,20 @@ class MapFragment : Fragment()
                 }
             }
         }
+    }
+
+    private fun checkIfRunesFound(runes : Runes) : Boolean {
+        return (runes!!.air != 0
+                || runes!!.darkness != 0
+                || runes!!.earth != 0
+                || runes!!.energy != 0
+                || runes!!.fire != 0
+                || runes!!.life != 0
+                || runes!!.light != 0
+                || runes!!.logic != 0
+                || runes!!.music != 0
+                || runes!!.space != 0
+                || runes!!.toxic != 0)
     }
 
 

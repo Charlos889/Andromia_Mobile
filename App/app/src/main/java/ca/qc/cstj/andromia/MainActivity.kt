@@ -11,16 +11,22 @@ import android.support.v4.app.FragmentManager
 import android.support.v4.view.GravityCompat
 import android.support.v4.widget.DrawerLayout
 import android.support.v7.app.AlertDialog
+import android.support.v7.widget.GridLayoutManager
 import android.util.Log
 import android.view.MenuItem
 import android.widget.Toast
+import ca.qc.cstj.andromia.adapters.RunesNavigationDrawerAdapter
+import ca.qc.cstj.andromia.adapters.RunesRecyclerViewAdapter
 import ca.qc.cstj.andromia.dialogs.CaptureUnitDialogFragment
 import ca.qc.cstj.andromia.dialogs.PortalNotFoundDialogFragment
 import ca.qc.cstj.andromia.fragments.*
 import ca.qc.cstj.andromia.models.Exploration
 import ca.qc.cstj.andromia.models.Explorer
+import ca.qc.cstj.andromia.models.Runes
 import ca.qc.cstj.andromia.models.Unit
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.android.synthetic.main.fragment_details_unit.*
+import kotlinx.android.synthetic.main.fragment_unit_list.*
 import kotlinx.android.synthetic.main.header_navigation.*
 
 
@@ -73,13 +79,18 @@ class MainActivity : AppCompatActivity()
 
     override fun utilisateurCharge(utilisateur: Explorer) {
         explorer = utilisateur
-        modifierTitre(utilisateur.username)
+        modifierTitre(utilisateur.username.toUpperCase())
 
-        txtNomExplorer.text = utilisateur.username
+        txtNomExplorer.text = utilisateur.username.toUpperCase()
         txtQtyInox.text = utilisateur.inox.amount.toString()
 
         progressDialog?.dismiss()
         progressDialog = null
+
+        val mapRunes : Map<String, Int> = RunesObjectToMap(utilisateur.runes)
+
+        rcvRunes.layoutManager = GridLayoutManager(this, 4)
+        rcvRunes.adapter = RunesNavigationDrawerAdapter(mapRunes)
     }
 
     override fun utilisateurExistant(): Boolean {
@@ -179,6 +190,10 @@ class MainActivity : AppCompatActivity()
         return super.onSupportNavigateUp()
     }
 
+    override fun onPortalNotFoundPositiveClick(dialog: DialogFragment) {
+        dialog.dismiss()
+    }
+
     private fun changeFragment(newFragment : Fragment, saveInBackstack : Boolean = true, animate:Boolean = true, tag:String = newFragment.javaClass.name) {
 
         try {
@@ -260,7 +275,22 @@ class MainActivity : AppCompatActivity()
         changeFragment(LoginFragment.newInstance(), false)
     }
 
-    override fun onPortalNotFoundPositiveClick(dialog: DialogFragment) {
-        dialog.dismiss()
+    private fun RunesObjectToMap(runes : Runes) : Map<String, Int> {
+        val map = mutableMapOf<String, Int>()
+
+        map["air"] = runes.air
+        map["darkness"] = runes.darkness
+        map["earth"] = runes.earth
+        map["energy"] = runes.energy
+        map["fire"] = runes.fire
+        map["life"] = runes.life
+        map["light"] = runes.light
+        map["logic"] = runes.logic
+        map["music"] = runes.music
+        map["space"] = runes.space
+        map["toxic"] = runes.toxic
+        map["water"] = runes.water
+
+        return map
     }
 }

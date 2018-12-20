@@ -49,7 +49,9 @@ class MainActivity : AppCompatActivity()
     }
 
     override fun onListExplorationFragmentInteraction(item: Exploration?) {
-        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+        if (item?.unit != null && item.capture) {
+            changeFragment(DetailsUnitFragment.newInstance(item.unit))
+        }
     }
 
     override fun ouvrirSignup() {
@@ -72,10 +74,26 @@ class MainActivity : AppCompatActivity()
         txtNomExplorer.text = utilisateur.username
         txtQtyInox.text = utilisateur.inox.amount.toString()
 
-        if (progressDialog != null) {
-            progressDialog!!.dismiss()
-        }
+        progressDialog?.dismiss()
         progressDialog = null
+    }
+
+    override fun utilisateurExistant(): Boolean {
+        return explorer.username != ""
+    }
+
+    override fun retourLogin() {
+        progressDialog?.dismiss()
+        progressDialog = null
+
+        val alert = AlertDialog.Builder(this)
+
+        alert.setTitle("Une erreur est survenue")
+        alert.setMessage("Veuillez réessayer plus tard")
+        alert.setNeutralButton("OK") { dialog, which ->
+            logout()
+        }
+        alert.show()
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -98,18 +116,14 @@ class MainActivity : AppCompatActivity()
                     modifierTitre(explorer.username)
                 }
                 R.id.nvmUnits -> {
-                    changeFragment(ListUnitFragment.newInstance(2))
+                    changeFragment(ListUnitFragment.newInstance(2, explorer.units))
                     modifierTitre(explorer.username)
                 }
+                R.id.nvmExplorations -> {
+                    changeFragment(ListExplorationFragment.newInstance(explorer.explorations))
+                }
                 R.id.nvmLogout -> {
-                    val preferences = getSharedPreferences("Andromia", Context.MODE_PRIVATE).edit()
-                    preferences.putString("token", "")
-                    preferences.putString("username", "")
-                    preferences.commit()
-
-                    supportFragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
-                    modifierTitre("Andromia")
-                    changeFragment(LoginFragment.newInstance(), false)
+                    logout()
                 }
             }
 
@@ -159,6 +173,14 @@ class MainActivity : AppCompatActivity()
         }
 
         return super.onSupportNavigateUp()
+    }
+
+    override fun onDialogPositiveClick(dialog: DialogFragment) {
+        Toast.makeText(this, "Oui", Toast.LENGTH_LONG).show()
+    }
+
+    override fun onDialogNegativeClick(dialog: DialogFragment) {
+        Toast.makeText(this, "Non", Toast.LENGTH_LONG).show()
     }
 
     private fun changeFragment(newFragment : Fragment, saveInBackstack : Boolean = true, animate:Boolean = true, tag:String = newFragment.javaClass.name) {
@@ -231,11 +253,14 @@ class MainActivity : AppCompatActivity()
         }
     }
 
-    override fun onDialogPositiveClick(dialog: DialogFragment) {
-        Toast.makeText(this, "Oui", Toast.LENGTH_LONG).show()
-    }
+    private fun logout() {
+        val preferences = getSharedPreferences("Andromia", Context.MODE_PRIVATE).edit()
+        preferences.putString("token", "")
+        preferences.putString("username", "")
+        preferences.commit()
 
-    override fun onDialogNegativeClick(dialog: DialogFragment) {
-        Toast.makeText(this, "Non", Toast.LENGTH_LONG).show()
+        supportFragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
+        modifierTitre("Andromia")
+        changeFragment(LoginFragment.newInstance(), false)
     }
 }

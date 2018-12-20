@@ -35,11 +35,11 @@ import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.serialization.json.JSON
 import java.lang.Exception
 
+
 class MapFragment : Fragment()
                     , GestureDetector.OnGestureListener
                     , GestureDetector.OnDoubleTapListener
                     , CaptureUnitDialogFragment.CaptureUnitListener{
-
 
     private var positionJoueur = PointF(540f, 361f)
     private var tailleImage = PointF()
@@ -56,15 +56,20 @@ class MapFragment : Fragment()
         // Inflate the layout for this fragment
         val view = inflater.inflate(R.layout.fragment_map, container, false)
 
+        // Gérer les évènements sur la carte (déplacements, zoom, ...)
         view.setOnTouchListener { _, event ->
             when (event!!.action) {
+                // Gérer les déplacements
                 MotionEvent.ACTION_MOVE -> {
+                    // Pour éviter de déplacer la carte pendant qu'on zoom
                     if (event.pointerCount == 1) {
                         val newX = event.getX(0)
                         val newY = event.getY(0)
                         val scrollX = (newX - oldX)
                         val scrollY = (newY - oldY)
 
+                        // On vérife si les scrolls sont valides séparémment, car même si on est arrivé à une extrémité en X,
+                        // on veut pouvoir continuer de se déplacer en Y
                         if (verifierTranslationValide(scrollX, true)) {
                             imgMap.translationX  += scrollX
                             oldX = newX
@@ -75,6 +80,7 @@ class MapFragment : Fragment()
                             oldY = newY
                         }
 
+                        // Repositionne le bouton du joueur
                         positionnerBouton()
                     } else {
                         ScaleDetector!!.onTouchEvent(event)
@@ -91,7 +97,9 @@ class MapFragment : Fragment()
     }
 
     override fun onStart() {
-
+        // On obtient les infos de l'explorer
+        // On le fait dans le onStart, pour faire en sorte que lorsque l'utilisateur revient en appuyant sur la flèche de retour
+        // on aille chercher à nouveau ses informations (utile pour updater ses runes et inox, qui sont ajoutées à chaque heure)
         val preferences = activity!!.getSharedPreferences("Andromia", Context.MODE_PRIVATE)
 
         EXPLORERS_URL.httpGet()
@@ -105,6 +113,7 @@ class MapFragment : Fragment()
                                 val explorer = json.obj()
                                 explorerObj = JSON.nonstrict.parse(Explorer.serializer(), explorer.toString())
 
+                                // Si l'utilisateur a fait des explorations, on update sa positon sur la carte
                                 if (explorerObj!!.explorations.isNotEmpty()) {
                                     val posJoueur = explorerObj!!.explorations.last().destination.coordonnees
 
@@ -133,36 +142,43 @@ class MapFragment : Fragment()
         gDetector = GestureDetectorCompat(this.context, this)
 
         gDetector?.setOnDoubleTapListener(this)
+        // Gérer le scaling de l'image
         ScaleDetector = ScaleGestureDetector(this.context, object : ScaleGestureDetector.SimpleOnScaleGestureListener() {
             override fun onScale(detector: ScaleGestureDetector?): Boolean {
                 val scale = imgMap.scaleX * detector!!.scaleFactor
 
+                // Limiter le zoom
                 if (scale < 1) {
                     imgMap.scaleX = 1f
                     imgMap.scaleY = 1f
-                }
-                else if (scale > 5) {
+                } else if (scale > 5) {
                     imgMap.scaleX = 5f
                     imgMap.scaleY = 5f
-                }
-                else {
+                } else {
                     imgMap.scaleX = scale
                     imgMap.scaleY = scale
                 }
 
+                // On doit repositionner, car la zone affichée à l'écran a changée
                 positionnerBouton()
 
                 return true
             }
         })
 
+        // Obtenir la taille actuelle de l'image
+        // Je suis pas sûr à 100% pourquoi, mais l'image de base fait 1044px de large, et sur l'émulateur que je testais, elle faisait 1800px de large
+        // Je crois qu'ils l'allongent pour que son Dpi match celui du cellulaire, mais je suis pas sûr.
+        // Mais comme le serveur va nous renvoyer des coordonnées par rapport à la vraie taille de l'image,
+        // on a besoin de connaître la vraie taille de l'image pour faire la comparaison
         val optBitmap = BitmapFactory.Options()
         optBitmap.inTargetDensity = DisplayMetrics.DENSITY_DEFAULT
         val bmp = BitmapFactory.decodeResource(getResources(),
                 R.drawable.andromia, optBitmap)
-
         tailleImage = PointF(bmp.width.toFloat(), bmp.height.toFloat())
 
+        // Pour positionner le bouton lorsqu'on load le fragment pour la première fois
+        // Je le fais ici car j'ai besoin de la matrix de l'image
         imgMap.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
             override fun onGlobalLayout() {
                 imgMap.viewTreeObserver.removeOnGlobalLayoutListener(this)
@@ -171,6 +187,7 @@ class MapFragment : Fragment()
             }
         })
 
+        // OnClick du scan
         btnScan.setOnClickListener {
 
             val scanner = IntentIntegrator.forSupportFragment(this)
@@ -205,6 +222,7 @@ class MapFragment : Fragment()
     }
 
     override fun onDown(p0: MotionEvent?): Boolean {
+        // On obtient les coordonnées X, Y d'où on a cliqué
         oldX = p0!!.getX(0)
         oldY = p0.getY(0)
         return true
@@ -223,22 +241,26 @@ class MapFragment : Fragment()
     }
 
     override fun onDoubleTap(p0: MotionEvent?): Boolean {
+        // Gérer le double tap
 
+        // On ne veut pas partir une nouvelle animation si on est déjà en train de zoomer
         if (!setAnimation.isRunning) {
-            var scaleAnimation : ObjectAnimator?
-            var btnScaleAnimation : ObjectAnimator?
-            var newScale : Float = 0f
-            var newTransX : Float = 0f
-            var newTransY : Float = 0f
+            val scaleAnimation : ObjectAnimator?
+            val btnScaleAnimation : ObjectAnimator?
+            var newScale = 0f
+            var newTransX = 0f
+            var newTransY = 0f
 
+            // Zoom In
             if (imgMap.scaleX == 1f && imgMap.scaleY == 1f) {
-                var BaseScale = TypedValue()
+                val BaseScale = TypedValue()
 
                 resources.getValue(R.dimen.BASE_SCALE, BaseScale, true)
 
                 val pvhX = PropertyValuesHolder.ofFloat(View.SCALE_X, imgMap.scaleX, BaseScale.float)
                 val pvhY = PropertyValuesHolder.ofFloat(View.SCALE_Y, imgMap.scaleY, BaseScale.float)
 
+                // Obtenir la zone où l'utilisateur a cliqué
                 val point = zoomIn(p0!!.x, p0.y, BaseScale.float)
                 if (point != null) {
                     val trX = PropertyValuesHolder.ofFloat(View.TRANSLATION_X, imgMap.translationX, point.x)
@@ -246,17 +268,19 @@ class MapFragment : Fragment()
 
                     scaleAnimation = ObjectAnimator.ofPropertyValuesHolder(imgMap, pvhX, pvhY, trX, trY)
 
-
                     newScale = BaseScale.float
                     newTransX = point.x
                     newTransY = point.y
                 } else {
                     scaleAnimation = null
                 }
-            } else {
+            }
+            // Zoom Out
+            else {
                 val pvhX = PropertyValuesHolder.ofFloat(View.SCALE_X, imgMap.scaleX, 1f)
                 val pvhY = PropertyValuesHolder.ofFloat(View.SCALE_Y, imgMap.scaleY, 1f)
 
+                // On recentre
                 val trX = PropertyValuesHolder.ofFloat(View.TRANSLATION_X, imgMap.translationX, 0f)
                 val trY = PropertyValuesHolder.ofFloat(View.TRANSLATION_Y, imgMap.translationY, 0f)
 
@@ -268,15 +292,14 @@ class MapFragment : Fragment()
             }
 
             if (scaleAnimation != null) {
-                // Animation du bouton du joueur
+                // Obtenier le point central de l'écran
                 val matrix = FloatArray(9)
                 imgMap.imageMatrix.getValues(matrix)
-
                 val pointCentral = obtenirPointCentral(newScale, newScale, newTransX, newTransY, matrix)
 
+                // Animation du bouton du joueur
                 val btnTrX = PropertyValuesHolder.ofFloat(View.TRANSLATION_X, btnPosition.translationX, ((positionJoueur.x * (imgMap.pivotX * 2 - matrix[Matrix.MTRANS_X] * 2) / tailleImage.x) - pointCentral.x) * newScale)
                 val btnTrY = PropertyValuesHolder.ofFloat(View.TRANSLATION_Y, btnPosition.translationY, ((positionJoueur.y * (imgMap.pivotY * 2 - matrix[Matrix.MTRANS_Y] * 2) / tailleImage.y) - pointCentral.y) * newScale)
-
                 btnScaleAnimation = ObjectAnimator.ofPropertyValuesHolder(btnPosition, btnTrX, btnTrY)
 
                 setAnimation = AnimatorSet()
@@ -317,15 +340,15 @@ class MapFragment : Fragment()
         }
     }
 
-    override fun onCapturePositiveClick(dialog: DialogFragment, explorationBase: ExplorationBase?) {
+    override fun onCapturePositiveClick(dialog: DialogFragment, exploration: ExplorationBase?) {
 
-        saveExploration(explorationBase, true)
+        saveExploration(exploration, true)
         dialog.dismiss()
     }
 
-    override fun onCaptureNegativeClick(dialog: DialogFragment, explorationBase: ExplorationBase?) {
+    override fun onCaptureNegativeClick(dialog: DialogFragment, exploration: ExplorationBase?) {
 
-        saveExploration(explorationBase, false)
+        saveExploration(exploration, false)
 
         dialog.dismiss()
     }
@@ -384,6 +407,9 @@ class MapFragment : Fragment()
 
 
     private fun zoomIn(x : Float, y : Float, baseScale : Float) : PointF? {
+        // TODO : Améliorer la précision du zoom in, on ne zoom pas exactement où l'utilisateur a cliqué
+
+        // On obtient la position de la view à l'écran, puisque les positions X,Y du click sont selon l'écran complet
         val posView = IntArray(2)
         imgMap.getLocationOnScreen(posView)
 
@@ -406,22 +432,24 @@ class MapFragment : Fragment()
     }
 
     private fun obtenirTailleMap() : PointF {
+        // Retourne la taille de la carte affichée à l'écran
         val matrix = FloatArray(9)
         imgMap.imageMatrix.getValues(matrix)
 
         val widthMap = (matrix[Matrix.MSCALE_X] * imgMap.drawable.intrinsicWidth)
         val heightMap = (matrix[Matrix.MSCALE_Y] * imgMap.drawable.intrinsicHeight)
-
         return PointF(widthMap, heightMap)
     }
 
     private fun obtenirPointCentral(newScaleX : Float, newScaleY : Float, newTransX : Float, newTransY: Float, matrix : FloatArray) : PointF {
+        // Obtient le point central affiché à l'écran selon la scale et les translations données
         return PointF((imgMap.pivotX) - matrix[Matrix.MTRANS_X] - (newTransX / newScaleX),
                 (imgMap.pivotY) - matrix[Matrix.MTRANS_Y] - (newTransY / newScaleY))
     }
 
     private fun verifierTranslationValide(trans : Float, transHori : Boolean) : Boolean {
-        var curr: Float
+        // Vérifie si la translation demandée est valide
+        val curr: Float
         val tailleMap = obtenirTailleMap()
 
         if (transHori) {
@@ -438,6 +466,7 @@ class MapFragment : Fragment()
     }
 
     private fun positionnerBouton(): Boolean {
+        // Repositionne le bouton du joueur à l'écran
         val matrix = FloatArray(9)
         imgMap.imageMatrix.getValues(matrix)
 
@@ -450,14 +479,12 @@ class MapFragment : Fragment()
 
 
     interface OnFragmentInteractionListener {
-        // TODO: Update argument type and name
         fun utilisateurCharge(utilisateur: Explorer)
         fun utilisateurExistant() : Boolean
         fun retourLogin()
     }
 
     companion object {
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance() = MapFragment()
     }

@@ -70,10 +70,7 @@ class MainActivity : AppCompatActivity()
     override fun connectionEffecutee() {
         changeFragment(MapFragment.newInstance(), false)
 
-        progressDialog = ProgressDialog(this)
-        progressDialog!!.isIndeterminate = true
-        progressDialog!!.setMessage("Chargement en cours...")
-        progressDialog!!.show()
+        afficherProgressBar()
     }
 
     override fun utilisateurCharge(utilisateur: Explorer) {
@@ -153,15 +150,18 @@ class MainActivity : AppCompatActivity()
             changeFragment(LoginFragment.newInstance(), false)
         } else {
             changeFragment(MapFragment.newInstance(), false)
+            afficherProgressBar()
         }
     }
 
     override fun onBackPressed() {
+        // Si le navigation drawer est ouvert, on le ferme
         if (mainLayout.isDrawerOpen(GravityCompat.START)) {
             mainLayout.closeDrawer(GravityCompat.START)
         } else {
             super.onBackPressed()
 
+            // Update le menu
             val fragment = supportFragmentManager.findFragmentById(R.id.contentFrame)
             modifierReturnButton(fragment)
             modifierMenuOptions(fragment)
@@ -174,9 +174,11 @@ class MainActivity : AppCompatActivity()
 
         when (fragment) {
             is MapFragment -> {
+                // Si on clique sur le bouton Home pendant qu'on est sur MapFragment, on veut ouvrir le navigation drawer
                 mainLayout.openDrawer(GravityCompat.START)
             }
             else -> {
+                // Retour d'un fragment en arrière
                 supportFragmentManager.popBackStackImmediate()
 
                 fragment = supportFragmentManager.findFragmentById(R.id.contentFrame)
@@ -224,6 +226,7 @@ class MainActivity : AppCompatActivity()
     }
 
     private fun modifierMenuOptions(fragmentActuel: Fragment) {
+        // Si le menu est accessible
         menuOuvert = when (fragmentActuel) {
             is LoginFragment, is SignupFragment -> {
                 false
@@ -237,6 +240,7 @@ class MainActivity : AppCompatActivity()
     }
 
     private fun modifierNavigationDrawer(fragmentActuel: Fragment) {
+        // Si le fragment est accessible
         when (fragmentActuel) {
             is LoginFragment, is SignupFragment -> {
                 mainLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_LOCKED_CLOSED)
@@ -245,11 +249,33 @@ class MainActivity : AppCompatActivity()
                 mainLayout.setDrawerLockMode(DrawerLayout.LOCK_MODE_UNLOCKED)
             }
         }
+
+        var id = 0
+
+        when (fragmentActuel) {
+            is MapFragment -> {
+                id = R.id.nvmHome
+            }
+            is ListUnitFragment -> {
+                id = R.id.nvmUnits
+            }
+            is ListExplorationFragment -> {
+                id = R.id.nvmExplorations
+            }
+        }
+
+        for (i in 0 until ngvAndromia.menu.size()) {
+            val item = ngvAndromia.menu.getItem(i)
+
+            item.isChecked = (item.itemId == id)
+        }
     }
 
     private fun modifierReturnButton(fragmentActuel: Fragment) {
+        // Si le bouton home est accessible
         when (fragmentActuel) {
             is MapFragment -> {
+                // Sur la map, on montre le hamburger plutôt que la flèche de retour
                 supportActionBar!!.setDisplayHomeAsUpEnabled(true)
                 supportActionBar!!.setHomeAsUpIndicator(R.drawable.ic_menu)
             }
@@ -269,6 +295,7 @@ class MainActivity : AppCompatActivity()
         preferences.putString("username", "")
         preferences.commit()
 
+        // On retire tous les fragments du BackStack
         supportFragmentManager.popBackStackImmediate(null, FragmentManager.POP_BACK_STACK_INCLUSIVE)
         modifierTitre("Andromia")
         changeFragment(LoginFragment.newInstance(), false)
@@ -291,5 +318,14 @@ class MainActivity : AppCompatActivity()
         map["water"] = runes.water
 
         return map
+    }
+
+    private fun afficherProgressBar() {
+        // Oui, j'ai réalisé que ProgressDialog est deprecated parce qu'il bloque l'utilisateur d'interagir avec le UI,
+        // par contre, c'est exactement ce que je veux, donc ça reste la méthode la plus simple d'arriver à mon but
+        progressDialog = ProgressDialog(this)
+        progressDialog!!.isIndeterminate = true
+        progressDialog!!.setMessage("Chargement en cours...")
+        progressDialog!!.show()
     }
 }

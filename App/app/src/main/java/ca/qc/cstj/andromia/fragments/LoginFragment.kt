@@ -18,18 +18,7 @@ import kotlinx.android.synthetic.main.fragment_login.*
 import org.json.JSONObject
 
 
-/**
- * A simple [Fragment] subclass.
- * Activities that contain this fragment must implement the
- * [LoginFragment.OnFragmentInteractionListener] interface
- * to handle interaction events.
- * Use the [LoginFragment.newInstance] factory method to
- * create an instance of this fragment.
- *
- */
 class LoginFragment : Fragment() {
-    // TODO: Rename and change types of parameters
-
 
     private var listener: OnFragmentInteractionListener? = null
 
@@ -67,34 +56,18 @@ class LoginFragment : Fragment() {
         listener = null
     }
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     *
-     *
-     * See the Android Training lesson [Communicating with Other Fragments]
-     * (http://developer.android.com/training/basics/fragments/communicating.html)
-     * for more information.
-     */
     interface OnFragmentInteractionListener {
         fun connectionEffecutee()
         fun ouvrirSignup()
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         * @return A new instance of fragment LoginFragment.
-         */
         @JvmStatic
         fun newInstance() = LoginFragment()
     }
 
     private fun onLoginPressed() {
-
+        // Validation des informations
         val allFields = arrayOf<FormEditText>(edtUsername, edtPassword)
 
         var allValid = true
@@ -147,6 +120,7 @@ class LoginFragment : Fragment() {
     }
 
     private fun closeKeyboard() {
+        // Force la fermeture du keyboard
         val view = this.view
         if(view != null) {
             val imm = context?.getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager

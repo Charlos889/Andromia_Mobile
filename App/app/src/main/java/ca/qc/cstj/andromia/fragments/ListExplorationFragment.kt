@@ -1,6 +1,7 @@
 package ca.qc.cstj.andromia.fragments
 
 import android.content.Context
+import android.opengl.Visibility
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.DividerItemDecoration
@@ -35,50 +36,55 @@ class ListExplorationFragment : Fragment() {
     private var listener: OnListFragmentInteractionListener? = null
     private var explorations : MutableList<Exploration> = mutableListOf()
     private var pagination : Pagination<Exploration>? = null
-    private val linearLayout = LinearLayoutManager(context)
+    private var linearLayout : LinearLayoutManager? = null
     private var isLoading = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
-        val view = inflater.inflate(R.layout.fragment_exploration_list, container, false)
 
-        // Set the adapter
-        if (view is RecyclerView) {
-            val decoration = DividerItemDecoration(context, VERTICAL)
+        isLoading = false
+        linearLayout = LinearLayoutManager(context)
 
-            with(view) {
-                layoutManager = linearLayout
-                adapter = ExplorationRecyclerViewAdapter(explorations, listener)
-                addItemDecoration(decoration)
-            }
-
-            view.addOnScrollListener(object: RecyclerView.OnScrollListener() {
-                override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
-                    super.onScrolled(recyclerView, dx, dy)
-
-                    val visibleItemCount = linearLayout.childCount
-                    val totalItemCount = linearLayout.itemCount
-                    val pastVisibleItems = linearLayout.findFirstVisibleItemPosition()
-
-                    if (visibleItemCount + pastVisibleItems >= totalItemCount && !isLoading) {
-                        if (pagination == null) {
-                            obtenirExplorations(null)
-                            isLoading = true
-                        } else if (pagination!!._links.self != pagination!!._links.last) {
-                            obtenirExplorations(pagination!!._links.next.href)
-                            isLoading = true
-                        }
-                    }
-                }
-            })
-        }
-        return view
+        return inflater.inflate(R.layout.fragment_exploration_list, container, false)
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        obtenirExplorations(null)
+        // Set the adapter
+        // divider entre les items
+        val decoration = DividerItemDecoration(context, VERTICAL)
+
+        with(rcvExplorations) {
+            layoutManager = linearLayout
+            adapter = ExplorationRecyclerViewAdapter(explorations, listener)
+            addItemDecoration(decoration)
+
+            addOnScrollListener(object : RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+                    // Pagination
+                    super.onScrolled(recyclerView, dx, dy)
+
+                    val visibleItemCount = linearLayout!!.childCount
+                    val totalItemCount = linearLayout!!.itemCount
+                    val pastVisibleItems = linearLayout!!.findFirstVisibleItemPosition()
+
+                    if (visibleItemCount + pastVisibleItems >= totalItemCount && !isLoading) {
+                        // Si la première requête n'a rien retourné, alors pagination peut être null
+                        if (pagination == null) {
+                            obtenirExplorations(null)
+                        } else if (!pageDejaChargee(pagination!!._links.last.href)) {
+                            obtenirExplorations(pagination!!._links.next.href)
+                        }
+                    }
+                }
+            })
+        }
+
+        if (explorations.isEmpty()) {
+            txvNoExploration.visibility = View.VISIBLE
+            obtenirExplorations(null)
+        }
     }
 
     override fun onAttach(context: Context) {
@@ -96,6 +102,7 @@ class ListExplorationFragment : Fragment() {
     }
 
     private fun obtenirExplorations(page : String?) {
+        // Obtient la liste des explorations de l'utilisateur
         isLoading = true
         val preferences = activity!!.getSharedPreferences("Andromia", Context.MODE_PRIVATE)
         val userToken = preferences.getString("token", "")
@@ -107,20 +114,35 @@ class ListExplorationFragment : Fragment() {
             "$page&pageLimit=15"
         }
 
-        path.httpGet().header(mapOf("Authorization" to "Bearer $userToken")).responseJson { request, response, result ->
+        path.httpGet().header(mapOf("Authorization" to "Bearer $userToken")).responseJson { _, response, result ->
             when (response.statusCode) {
                 200 -> {
                     val json = result.get()
-                    val newPagination = json.obj()
-                    pagination = JSON.nonstrict.parse(Pagination.serializer(Exploration.serializer()), newPagination.toString())
+                    val paginationObj = json.obj()
+                    pagination = JSON.nonstrict.parse(Pagination.serializer(Exploration.serializer()), paginationObj.toString())
+
                     explorations.addAll(pagination?.items!!)
-                    rcvExplorations.adapter.notifyDataSetChanged()
+
+                    if (explorations.size > 0) {
+                        rcvExplorations.adapter.notifyDataSetChanged()
+                        txvNoExploration.visibility = View.GONE
+                    } else {
+                        txvNoExploration.visibility = View.VISIBLE
+                    }
                     isLoading = false
                 }
             }
         }
     }
 
+    private fun pageDejaChargee(page: String) : Boolean {
+        // Vérifie si la page demandée a déjà été chargée
+        return (pagination != null && obtenirPage(pagination!!._links.self.href) >= obtenirPage(page))
+    }
+
+    private fun obtenirPage(page: String) : Int {
+        return page.substring(page.indexOf("page=") + 5, page.indexOf("&")).toInt()
+    }
     interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
         fun onListExplorationFragmentInteraction(item: Exploration?)

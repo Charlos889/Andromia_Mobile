@@ -63,8 +63,8 @@ class ExplorationRecyclerViewAdapter(
         fun bind(exploration : Exploration) {
             val dateFormat = SimpleDateFormat("dd/MM/yyyy HH:mm:ss")
 
-            txtDestination.text = "${txtDestination.text}${exploration.destination.nom}"
-            txtDateExploration.text = "${txtDateExploration.text}${dateFormat.format(exploration.dateExploration)}"
+            txtDestination.text = "Destination : ${exploration.destination.nom}"
+            txtDateExploration.text = "Date : ${dateFormat.format(exploration.dateExploration)}"
 
             if (exploration.unit != null) {
                 if (exploration.capture) {

@@ -3,8 +3,11 @@ package ca.qc.cstj.andromia.fragments
 import android.content.Context
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.widget.DividerItemDecoration
+import android.support.v7.widget.DividerItemDecoration.VERTICAL
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,6 +19,8 @@ import ca.qc.cstj.andromia.models.Pagination
 import ca.qc.cstj.andromia.models.Unit
 import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.httpGet
+import jp.wasabeef.picasso.transformations.CropTransformation
+import kotlinx.android.synthetic.main.fragment_exploration_list.*
 import kotlinx.android.synthetic.main.fragment_unit_list.*
 import kotlinx.serialization.json.JSON
 import kotlinx.serialization.list
@@ -29,6 +34,9 @@ class ListExplorationFragment : Fragment() {
 
     private var listener: OnListFragmentInteractionListener? = null
     private var explorations : MutableList<Exploration> = mutableListOf()
+    private var pagination : Pagination<Exploration>? = null
+    private val linearLayout = LinearLayoutManager(context)
+    private var isLoading = false
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -36,10 +44,33 @@ class ListExplorationFragment : Fragment() {
 
         // Set the adapter
         if (view is RecyclerView) {
+            val decoration = DividerItemDecoration(context, VERTICAL)
+
             with(view) {
-                layoutManager = LinearLayoutManager(context)
+                layoutManager = linearLayout
                 adapter = ExplorationRecyclerViewAdapter(explorations, listener)
+                addItemDecoration(decoration)
             }
+
+            view.addOnScrollListener(object: RecyclerView.OnScrollListener() {
+                override fun onScrolled(recyclerView: RecyclerView?, dx: Int, dy: Int) {
+                    super.onScrolled(recyclerView, dx, dy)
+
+                    val visibleItemCount = linearLayout.childCount
+                    val totalItemCount = linearLayout.itemCount
+                    val pastVisibleItems = linearLayout.findFirstVisibleItemPosition()
+
+                    if (visibleItemCount + pastVisibleItems >= totalItemCount && !isLoading) {
+                        if (pagination == null) {
+                            obtenirExplorations(null)
+                            isLoading = true
+                        } else if (pagination!!._links.self != pagination!!._links.last) {
+                            obtenirExplorations(pagination!!._links.next.href)
+                            isLoading = true
+                        }
+                    }
+                }
+            })
         }
         return view
     }
@@ -47,23 +78,7 @@ class ListExplorationFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val preferences = activity!!.getSharedPreferences("Andromia", Context.MODE_PRIVATE)
-        val userToken = preferences.getString("token", "")
-        val username = preferences.getString("username", "")
-        val path = "${EXPLORATIONS_URL}/${username}"
-
-        path.httpGet().header(mapOf("Authorization" to "Bearer $userToken")).responseJson { request, response, result ->
-            when (response.statusCode) {
-                200 -> {
-                    val json = result.get()
-                    val pagination = json.obj()
-                    val lstExplorations = JSON.nonstrict.parse(Pagination.serializer(Exploration.serializer()), pagination.toString())
-
-                    explorations.clear()
-                    explorations.addAll(lstExplorations.items!!)
-                }
-            }
-        }
+        obtenirExplorations(null)
     }
 
     override fun onAttach(context: Context) {
@@ -80,22 +95,39 @@ class ListExplorationFragment : Fragment() {
         listener = null
     }
 
+    private fun obtenirExplorations(page : String?) {
+        isLoading = true
+        val preferences = activity!!.getSharedPreferences("Andromia", Context.MODE_PRIVATE)
+        val userToken = preferences.getString("token", "")
+        val username = preferences.getString("username", "")
+
+        val path = if (page == null) {
+            "$EXPLORATIONS_URL/$username?pageLimit=15"
+        } else {
+            "$page&pageLimit=15"
+        }
+
+        path.httpGet().header(mapOf("Authorization" to "Bearer $userToken")).responseJson { request, response, result ->
+            when (response.statusCode) {
+                200 -> {
+                    val json = result.get()
+                    val newPagination = json.obj()
+                    pagination = JSON.nonstrict.parse(Pagination.serializer(Exploration.serializer()), newPagination.toString())
+                    explorations.addAll(pagination?.items!!)
+                    rcvExplorations.adapter.notifyDataSetChanged()
+                    isLoading = false
+                }
+            }
+        }
+    }
+
     interface OnListFragmentInteractionListener {
         // TODO: Update argument type and name
         fun onListExplorationFragmentInteraction(item: Exploration?)
     }
 
     companion object {
-
-        // TODO: Customize parameter argument names
-        const val ARG_EXPLORATIONS = "column-count"
-
-        // TODO: Customize parameter initialization
         @JvmStatic
-        fun newInstance(explorations : List<Exploration>) = ListExplorationFragment().apply {
-
-            this.explorations = explorations.toMutableList()
-
-        }
+        fun newInstance() = ListExplorationFragment()
     }
 }

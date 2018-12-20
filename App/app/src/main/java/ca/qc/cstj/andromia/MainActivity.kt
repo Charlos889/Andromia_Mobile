@@ -134,7 +134,7 @@ class MainActivity : AppCompatActivity()
                     modifierTitre(explorer.username)
                 }
                 R.id.nvmExplorations -> {
-                    changeFragment(ListExplorationFragment.newInstance(explorer.explorations))
+                    changeFragment(ListExplorationFragment.newInstance())
                 }
                 R.id.nvmLogout -> {
                     logout()

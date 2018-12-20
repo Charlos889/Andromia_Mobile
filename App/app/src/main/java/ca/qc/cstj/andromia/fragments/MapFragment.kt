@@ -11,6 +11,7 @@ import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.graphics.PointF
 import android.os.Bundle
+import android.os.Handler
 import android.support.v4.app.Fragment
 import android.support.v4.view.GestureDetectorCompat
 import android.util.DisplayMetrics
@@ -24,8 +25,10 @@ import ca.qc.cstj.andromia.PORTALS_URL
 import ca.qc.cstj.andromia.R
 import ca.qc.cstj.andromia.dialogs.CaptureUnitDialogFragment
 import ca.qc.cstj.andromia.dialogs.PortalNotFoundDialogFragment
+import ca.qc.cstj.andromia.dialogs.RunesFoundDialogFragment
 import ca.qc.cstj.andromia.models.ExplorationBase
 import ca.qc.cstj.andromia.models.Explorer
+import com.bumptech.glide.Glide
 import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.httpPost
@@ -38,8 +41,7 @@ import java.lang.Exception
 
 class MapFragment : Fragment()
                     , GestureDetector.OnGestureListener
-                    , GestureDetector.OnDoubleTapListener
-                    , CaptureUnitDialogFragment.CaptureUnitListener{
+                    , GestureDetector.OnDoubleTapListener {
 
     private var positionJoueur = PointF(540f, 361f)
     private var tailleImage = PointF()
@@ -50,6 +52,7 @@ class MapFragment : Fragment()
     private var ScaleDetector : ScaleGestureDetector? = null
     private var listener: OnFragmentInteractionListener? = null
     private var explorerObj: Explorer? = null
+    private val handler : Handler = Handler()
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
@@ -332,79 +335,14 @@ class MapFragment : Fragment()
                 if(result.contents == null) {
                     Toast.makeText(activity, "Cancelled", Toast.LENGTH_LONG).show()
                 } else {
-                    doExploration(result.contents)
+
+                    handler.postDelayed({listener!!.onPortalScanned(result.contents, explorerObj!!)}, 1500)
                 }
             } else {
                 super.onActivityResult(requestCode, resultCode, data)
             }
         }
     }
-
-    override fun onCapturePositiveClick(dialog: DialogFragment, exploration: ExplorationBase?) {
-
-        saveExploration(exploration, true)
-        dialog.dismiss()
-    }
-
-    override fun onCaptureNegativeClick(dialog: DialogFragment, exploration: ExplorationBase?) {
-
-        saveExploration(exploration, false)
-
-        dialog.dismiss()
-    }
-
-
-    private fun doExploration(uuid: String?) {
-
-        val url = "$PORTALS_URL/$uuid"
-        url.httpGet().responseObject<ExplorationBase>(json = JSON(strictMode = false)){ _, response, result ->
-            when(response.statusCode) {
-                200 -> {
-                    val unit = result.get().unit
-                    if(unit.name != null) {
-                        val dialog = CaptureUnitDialogFragment.newInstance(unit, explorerObj, result.get())
-                        dialog.setTargetFragment(this, 0)
-                        dialog.show(fragmentManager, "Capture")
-                    }
-                }
-                404 -> {
-                    val dialog = PortalNotFoundDialogFragment()
-                    dialog.show(fragmentManager, "PortalNotFound")
-                }
-            }
-        }
-    }
-
-    private fun saveExploration(explorationBase: ExplorationBase?, capture : Boolean) {
-        explorationBase!!.capture = capture
-
-        val preferences = activity!!.getSharedPreferences("Andromia", Context.MODE_PRIVATE)
-
-        val userToken = preferences.getString("token", "")
-
-        val jsonExploration = JSON.stringify(ExplorationBase.serializer(), explorationBase)
-        EXPLORATIONS_URL.httpPost()
-                .header(mapOf("Authorization" to "Bearer $userToken"))
-                .jsonBody(jsonExploration)
-                .responseObject<Explorer>(json = JSON(strictMode = false)){ _, response, result ->
-            when(response.statusCode) {
-                201 -> {
-                    val explorerReceived = result.get()
-                    val lastExploration = explorerReceived.explorations.last()
-
-                    // Modifier la position du joueur
-                    positionJoueur = PointF(lastExploration.destination.coordonnees.x.toFloat(), lastExploration.destination.coordonnees.y.toFloat())
-                    positionnerBouton()
-
-                    listener!!.utilisateurCharge(explorerReceived)
-                }
-                else -> {
-                    Log.d("error", response.toString())
-                }
-            }
-        }
-    }
-
 
     private fun zoomIn(x : Float, y : Float, baseScale : Float) : PointF? {
         // TODO : Améliorer la précision du zoom in, on ne zoom pas exactement où l'utilisateur a cliqué
@@ -482,6 +420,7 @@ class MapFragment : Fragment()
         fun utilisateurCharge(utilisateur: Explorer)
         fun utilisateurExistant() : Boolean
         fun retourLogin()
+        fun onPortalScanned(uuid : String, explorer : Explorer)
     }
 
     companion object {

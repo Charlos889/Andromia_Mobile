@@ -33,7 +33,7 @@ class ListUnitFragment : Fragment() {
 
     private var columnCount = 1
 
-    private var listener: OnListFragmentInteractionListener? = null
+    private var listener: OnListUnitFragmentInteractionListener? = null
     private var units : MutableList<Unit> = mutableListOf()
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -83,8 +83,10 @@ class ListUnitFragment : Fragment() {
 
                         units.clear()
                         units.addAll(lstUnits.toMutableList())
-                        if(units.size > 0)
+                        if (units.size > 0) {
                             rcvUnits.adapter.notifyDataSetChanged()
+                            txvNoUnit.visibility = View.GONE
+                        }
                         else {
                             txvNoUnit.visibility = View.VISIBLE
                         }
@@ -102,7 +104,7 @@ class ListUnitFragment : Fragment() {
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
-        if (context is OnListFragmentInteractionListener) {
+        if (context is OnListUnitFragmentInteractionListener) {
             listener = context
         } else {
             throw RuntimeException(context.toString() + " must implement OnListFragmentInteractionListener")
@@ -125,8 +127,8 @@ class ListUnitFragment : Fragment() {
      * [Communicating with Other Fragments](http://developer.android.com/training/basics/fragments/communicating.html)
      * for more information.
      */
-    interface OnListFragmentInteractionListener {
-        fun onListFragmentInteraction(unit: Unit?)
+    interface OnListUnitFragmentInteractionListener {
+        fun onListUnitFragmentInteraction(unit: Unit?)
     }
 
     companion object {

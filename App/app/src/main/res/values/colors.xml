@@ -5,4 +5,5 @@
     <color name="primaryDarkColor">#00600f</color>
     <color name="primaryTextColor">#000000</color>
     <color name="backgroundMap">#73bdeb</color>
+    <color name="lightGray">#c8c8c8</color>
 </resources>

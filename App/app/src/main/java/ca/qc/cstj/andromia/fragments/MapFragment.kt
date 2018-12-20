@@ -5,14 +5,12 @@ import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.app.Activity
 import android.support.v4.app.DialogFragment
-import android.app.FragmentManager
 import android.content.Context
 import android.content.Intent
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.graphics.PointF
 import android.os.Bundle
-import android.support.v4.app.DialogFragment
 import android.support.v4.app.Fragment
 import android.support.v4.view.GestureDetectorCompat
 import android.util.DisplayMetrics
@@ -26,7 +24,6 @@ import ca.qc.cstj.andromia.PORTALS_URL
 import ca.qc.cstj.andromia.R
 import ca.qc.cstj.andromia.dialogs.CaptureUnitDialogFragment
 import ca.qc.cstj.andromia.dialogs.PortalNotFoundDialogFragment
-import ca.qc.cstj.andromia.models.Exploration
 import ca.qc.cstj.andromia.models.ExplorationBase
 import ca.qc.cstj.andromia.models.Explorer
 import com.github.kittinunf.fuel.android.extension.responseJson
@@ -37,7 +34,6 @@ import com.google.zxing.integration.android.IntentIntegrator
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.serialization.json.JSON
 import java.lang.Exception
-import java.util.*
 
 class MapFragment : Fragment()
                     , GestureDetector.OnGestureListener
@@ -371,7 +367,14 @@ class MapFragment : Fragment()
                 .responseObject<Explorer>(json = JSON(strictMode = false)){ _, response, result ->
             when(response.statusCode) {
                 201 -> {
-                    listener!!.utilisateurCharge(result.get())
+                    val explorerReceived = result.get()
+                    val lastExploration = explorerReceived.explorations.last()
+
+                    // Modifier la position du joueur
+                    positionJoueur = PointF(lastExploration.destination.coordonnees.x.toFloat(), lastExploration.destination.coordonnees.y.toFloat())
+                    positionnerBouton()
+
+                    listener!!.utilisateurCharge(explorerReceived)
                 }
                 else -> {
                     Log.d("error", response.toString())

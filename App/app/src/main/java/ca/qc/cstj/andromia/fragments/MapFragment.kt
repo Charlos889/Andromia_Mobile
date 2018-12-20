@@ -107,7 +107,6 @@ class MapFragment : Fragment()
                                     val posJoueur = explorerObj!!.explorations.last().destination.coordonnees
 
                                     positionJoueur = PointF(posJoueur.x.toFloat(), posJoueur.y.toFloat())
-
                                     positionnerBouton()
                                 }
 

@@ -69,8 +69,8 @@
             android:layout_height="50dp"
             android:text="Signup"
             android:layout_marginTop="50dp"
-            android:layout_marginRight="10dp"
-            android:layout_gravity="bottom|right"/>
+            android:layout_marginEnd="10dp"
+            android:layout_gravity="bottom|end"/>
 
     </LinearLayout>
 </android.support.constraint.ConstraintLayout>

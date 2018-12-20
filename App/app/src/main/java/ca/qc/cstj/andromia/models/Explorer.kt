@@ -6,12 +6,12 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class Explorer constructor(
         val runes: Runes,
-        val units: List<Unit>,
+        val units: LienPage,
         val inox: Inox,
-        val explorations: List<Exploration>,
+        val explorations: LienPage,
         val username: String,
         val email: String,
         val href: String) : BaseObservable() {
 
-    constructor() : this(Runes(), listOf<Unit>(), Inox(0), listOf<Exploration>(), "Andromia", "", "")
+    constructor() : this(Runes(), LienPage(""), Inox(0), LienPage(""), "Andromia", "", "")
 }

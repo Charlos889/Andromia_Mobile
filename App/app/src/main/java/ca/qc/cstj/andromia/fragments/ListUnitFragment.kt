@@ -76,7 +76,7 @@ class ListUnitFragment : Fragment() {
                     .responseJson() { _, response, result ->
                 when (response.statusCode) {
                     200 -> {
-                        var lstUnits: List<Unit>
+                        val lstUnits: List<Unit>
                         val json = result.get()
                         val items = json.obj().get("items")
                         lstUnits = JSON.nonstrict.parse(Unit.serializer().list, items.toString())
@@ -91,7 +91,10 @@ class ListUnitFragment : Fragment() {
                             txvNoUnit.visibility = View.VISIBLE
                         }
                     }
-                    // Ici, on  ne gère pas les codes d'erreurs, car comme on passe la liste des units de l'explorer
+                    401 -> {
+                        listener!!.deconnexionListUnit()
+                    }
+                    // Ici, on  ne gère pas les autres codes d'erreurs, car comme on passe la liste des units de l'explorer
                     // dans le constructeur, cette requête ne permet que d'updater la liste, donc même s'il y a une erreur,
                     // on pourra quand même afficher une liste, donc afficher l'erreur semble inutile. (Si c'est que le serveur
                     // est down, il obtiendra l'erreur en revenant au menu principal)
@@ -129,6 +132,7 @@ class ListUnitFragment : Fragment() {
      */
     interface OnListUnitFragmentInteractionListener {
         fun onListUnitFragmentInteraction(unit: Unit?)
+        fun deconnexionListUnit()
     }
 
     companion object {

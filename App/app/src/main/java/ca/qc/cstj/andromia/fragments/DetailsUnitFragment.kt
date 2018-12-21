@@ -61,8 +61,16 @@ class DetailsUnitFragment : Fragment() {
         rcvAbilities.layoutManager = LinearLayoutManager(view.context)
         rcvAbilities.adapter = AbilitiesRecyclerViewAdapter(unit?.runes!!.abilities)
 
+        if (unit?.runes!!.abilities.isEmpty()) {
+            txvAbilities.visibility = View.GONE
+        }
+
         rcvWeapons.layoutManager = LinearLayoutManager(view.context)
         rcvWeapons.adapter = WeaponsRecyclerViewAdapter(unit?.runes!!.weapons)
+
+        if (unit?.runes!!.weapons.isEmpty()) {
+            txvWeapons.visibility = View.GONE
+        }
     }
 
     fun RunesObjectToMap(runes : Runes) : Map<String, Int> {

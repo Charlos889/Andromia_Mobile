@@ -15,7 +15,6 @@ import android.os.Handler
 import android.support.v4.app.Fragment
 import android.support.v4.view.GestureDetectorCompat
 import android.util.DisplayMetrics
-import android.util.Log
 import android.util.TypedValue
 import android.view.*
 import android.widget.Toast

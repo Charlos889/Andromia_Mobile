@@ -1,8 +1,7 @@
 package ca.qc.cstj.andromia.fragments
 
+import android.app.AlertDialog
 import android.content.Context
-import android.graphics.PointF
-import android.net.Uri
 import android.os.Bundle
 import android.os.Handler
 import android.support.v4.app.DialogFragment
@@ -16,19 +15,19 @@ import ca.qc.cstj.andromia.PORTALS_URL
 
 import ca.qc.cstj.andromia.R
 import ca.qc.cstj.andromia.dialogs.CaptureUnitDialogFragment
-import ca.qc.cstj.andromia.dialogs.PortalNotFoundDialogFragment
 import ca.qc.cstj.andromia.dialogs.RunesFoundDialogFragment
 import ca.qc.cstj.andromia.models.Exploration
 import ca.qc.cstj.andromia.models.ExplorationBase
 import ca.qc.cstj.andromia.models.Explorer
 import com.bumptech.glide.Glide
+import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.fuel.serialization.responseObject
 import kotlinx.android.synthetic.main.fragment_portal.view.*
 import kotlinx.serialization.json.JSON
 
-// TODO: Rename parameter arguments, choose names that match
+
 // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_UUID = "uuid"
 
@@ -115,10 +114,10 @@ class PortalFragment :   Fragment()
 
         val url = "$PORTALS_URL/$uuid"
         url.httpGet().responseObject<ExplorationBase>(json = JSON(strictMode = false)){ _, response, result ->
+        //url.httpGet().response{ _, response, result ->
             when(response.statusCode) {
                 200 -> {
                     val explorationRespose = result.get()
-
                     if(explorationRespose.unit.name != null) {
                         val dialog = CaptureUnitDialogFragment.newInstance(explorationRespose.unit, explorer, result.get())
                         dialog.isCancelable = false
@@ -128,8 +127,13 @@ class PortalFragment :   Fragment()
                     }
                 }
                 404 -> {
-                    val dialog = PortalNotFoundDialogFragment()
-                    dialog.show(childFragmentManager, "PortalNotFound")
+
+                    val builder = AlertDialog.Builder(activity)
+                    val dialog = builder.setTitle("Error")
+                            .setMessage("The portal that you scanned could not be found..")
+                            .setNeutralButton("Okay", {dialog, id -> })
+                            .create()
+                    dialog.show()
                 }
             }
         }

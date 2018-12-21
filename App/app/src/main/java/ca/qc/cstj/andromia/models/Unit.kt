@@ -13,6 +13,7 @@ data class Unit(@Optional val name : String? = null,
                 @Optional val affinity : String? = null,
                 @Optional val runes : UnitRunes? = null,
                 @Optional val set : String? = null,
+                @Optional val number : Int? = null,
                 @Optional val uuid : String? = null,
                 @Optional val kernel : Runes? = null,
                 @Optional @Serializable(with = DateSerializer::class) val createdDate : Date? = null) {}

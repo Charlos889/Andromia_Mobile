@@ -16,6 +16,7 @@ import ca.qc.cstj.andromia.PORTALS_URL
 import ca.qc.cstj.andromia.R
 import ca.qc.cstj.andromia.dialogs.CaptureUnitDialogFragment
 import ca.qc.cstj.andromia.dialogs.RunesFoundDialogFragment
+import ca.qc.cstj.andromia.models.Exploration
 import ca.qc.cstj.andromia.models.ExplorationBase
 import ca.qc.cstj.andromia.models.Explorer
 import com.bumptech.glide.Glide
@@ -147,10 +148,10 @@ class PortalFragment :   Fragment()
         EXPLORATIONS_URL.httpPost()
                 .header(mapOf("Authorization" to "Bearer $userToken"))
                 .jsonBody(jsonExploration)
-                .responseObject<Explorer>(json = JSON(strictMode = false)){ _, response, result ->
+                .responseObject<Exploration>(json = JSON(strictMode = false)){ _, response, result ->
                     when(response.statusCode) {
                         201 -> {
-                            val lastExploration = result.get().explorations.last()
+                            val lastExploration = result.get()
 
                             // Afficher les runes trouvés durant l'exploration (s'il y en a)
                             val dialogRunes = RunesFoundDialogFragment.newInstance(lastExploration.runes, lastExploration.destination.nom )
@@ -161,6 +162,10 @@ class PortalFragment :   Fragment()
                                 dialogRunes.show(fragmentManager, "RunesFound")
                             }, 1000)
 
+                        }
+                        // Le token a expired
+                        401 -> {
+                            listener!!.deconnexionPortal()
                         }
                         else -> {
                             Log.d("error", response.toString())
@@ -182,6 +187,7 @@ class PortalFragment :   Fragment()
      */
     interface OnFragmentInteractionListener {
         fun onExplorationDone()
+        fun deconnexionPortal()
     }
 
     companion object {

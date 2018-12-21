@@ -20,6 +20,8 @@ import android.widget.Toast
 import ca.qc.cstj.andromia.EXPLORERS_URL
 import ca.qc.cstj.andromia.R
 import ca.qc.cstj.andromia.models.Explorer
+import ca.qc.cstj.andromia.models.PositionExploration
+import com.bumptech.glide.Glide
 import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.httpGet
 import com.google.zxing.integration.android.IntentIntegrator
@@ -94,7 +96,9 @@ class MapFragment : Fragment()
         // on aille chercher à nouveau ses informations (utile pour updater ses runes et inox, qui sont ajoutées à chaque heure)
         val preferences = activity!!.getSharedPreferences("Andromia", Context.MODE_PRIVATE)
 
-        EXPLORERS_URL.httpGet()
+        var path = "$EXPLORERS_URL/${preferences.getString("username", "")}"
+
+        path.httpGet()
                 .header(mapOf("Authorization" to "Bearer ${preferences.getString("token", "")}"))
                 .responseJson { request, response, result ->
 
@@ -105,18 +109,51 @@ class MapFragment : Fragment()
                                 val explorer = json.obj()
                                 explorerObj = JSON.nonstrict.parse(Explorer.serializer(), explorer.toString())
 
-                                // Si l'utilisateur a fait des explorations, on update sa positon sur la carte
-                                if (explorerObj!!.explorations.isNotEmpty()) {
-                                    val posJoueur = explorerObj!!.explorations.last().destination.coordonnees
-
-                                    positionJoueur = PointF(posJoueur.x.toFloat(), posJoueur.y.toFloat())
-                                    positionnerBouton()
-                                }
-
                                 listener!!.utilisateurCharge(explorerObj!!)
                             } catch (e : Exception) {
                                 e.printStackTrace()
                             }
+                        }
+                        // Le token a expired
+                        401 -> {
+                            listener!!.retourLogin()
+                        }
+                        else -> {
+                            // Si le serveur ferme pendant que l'utilisateur utilise l'application,
+                            // on veut l'avertir du problème, sans nécessairement le bloquer d'utiliser l'application
+                            // Sinon, on le déconnecte (ça sert à rien de le laisser continuer, on n'a pas ses infos)
+                            if (listener!!.utilisateurExistant()) {
+                                Toast.makeText(this.context, "Une erreur est survenue...", Toast.LENGTH_LONG).show()
+                            } else {
+                                listener!!.retourLogin()
+                            }
+                        }
+                    }
+                }
+
+        path = "$EXPLORERS_URL/${preferences.getString("username", "")}/location"
+
+        path.httpGet()
+                .header(mapOf("Authorization" to "Bearer ${preferences.getString("token", "")}"))
+                .responseJson { request, response, result ->
+
+                    when (response.statusCode) {
+                        200 -> {
+                            try {
+                                val json = result.get()
+                                val position = json.obj()
+                                val positionObj = JSON.nonstrict.parse(PositionExploration.serializer(), position.toString())
+
+                                // On update la position du joueur
+                                positionJoueur = PointF(positionObj.coordonnees.x.toFloat(), positionObj.coordonnees.y.toFloat())
+                                positionnerBouton()
+                            } catch (e : Exception) {
+                                e.printStackTrace()
+                            }
+                        }
+                        // Le token a expired
+                        401 -> {
+                            listener!!.retourLogin()
                         }
                         else -> {
                             // Si le serveur ferme pendant que l'utilisateur utilise l'application,

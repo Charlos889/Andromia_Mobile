@@ -375,7 +375,7 @@ class MapFragment : Fragment()
                     Toast.makeText(activity, "Cancelled", Toast.LENGTH_LONG).show()
                 } else {
 
-                    handler.postDelayed({listener!!.onPortalScanned(result.contents, explorerObj!!)}, 1500)
+                    listener!!.onPortalScanned(result.contents, explorerObj!!)
                 }
             } else {
                 super.onActivityResult(requestCode, resultCode, data)

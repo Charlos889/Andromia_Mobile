@@ -1,6 +1,7 @@
 package ca.qc.cstj.andromia.fragments
 
 import android.app.AlertDialog
+import android.app.FragmentManager
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
@@ -66,13 +67,9 @@ class PortalFragment :   Fragment()
         val imgBackground = view.imgBackground
         Glide.with(view.context).load(R.drawable.portal_gif).into(imgBackground)
 
-        return view
-    }
-
-    override fun onStart() {
-        super.onStart()
-
         doExploration(uuid)
+
+        return view
     }
 
     override fun onAttach(context: Context) {
@@ -121,7 +118,8 @@ class PortalFragment :   Fragment()
                     if(explorationRespose.unit.name != null) {
                         val dialog = CaptureUnitDialogFragment.newInstance(explorationRespose.unit, explorer, result.get())
                         dialog.isCancelable = false
-                        dialog.show(childFragmentManager, "Capture")
+
+                        handler.postDelayed({dialog.show(childFragmentManager, "Capture")}, 1500)
                     } else {
                         saveExploration(result.get(), false)
                     }
@@ -131,7 +129,9 @@ class PortalFragment :   Fragment()
                     val builder = AlertDialog.Builder(activity)
                     val dialog = builder.setTitle("Error")
                             .setMessage("The portal that you scanned could not be found..")
-                            .setNeutralButton("Okay", {dialog, id -> })
+                            .setNeutralButton("Okay", {dialog, id ->
+                                listener!!.onExplorationDone()
+                            })
                             .create()
                     dialog.show()
                 }

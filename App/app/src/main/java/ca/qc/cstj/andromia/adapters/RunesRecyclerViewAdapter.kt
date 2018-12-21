@@ -34,7 +34,7 @@ class RunesRecyclerViewAdapter<K, V>(
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         val key = keys.elementAt(position)
-        val pair = Pair(key, Runes[key]!!)
+        val pair = Pair(key, Runes[key]!!) as Pair<String, Int>
 
         with(holder) {
             bind(pair)
@@ -47,9 +47,15 @@ class RunesRecyclerViewAdapter<K, V>(
         val imgRune : ImageView = view.imgRuneKernel
         val txtQuantity : TextView = view.txtQuantityRuneKernel
 
-        fun bind(pair : Pair<K, V>) {
-            txtQuantity.text = pair.second.toString()
-            Picasso.with(view.context).load("$DRAWABLE_PATH${pair.first.toString()}").into(imgRune)
+        fun bind(pair : Pair<String, Int>) {
+
+            val quantite = pair.second
+            if (quantite > 99) {
+                txtQuantity.text = "99+"
+            } else {
+                txtQuantity.text = quantite.toString()
+            }
+            Picasso.with(view.context).load("$DRAWABLE_PATH${pair.first}").into(imgRune)
         }
     }
 }

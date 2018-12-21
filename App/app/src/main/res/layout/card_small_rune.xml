@@ -5,7 +5,9 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:cardCornerRadius="10dp"
     android:layout_marginEnd="1dp"
-    android:layout_marginBottom="5dp">
+    android:layout_marginBottom="5dp"
+    app:cardBackgroundColor="@android:color/transparent"
+    app:cardElevation="0dp">
 
     <LinearLayout
         android:layout_width="wrap_content"
@@ -14,8 +16,7 @@
 
         <ImageView
             android:id="@+id/imgRuneKernel"
-            android:layout_width="0dp"
-            android:layout_weight="2"
+            android:layout_width="20sp"
             android:layout_height="20dp"
             android:layout_marginStart="2dp"
             android:layout_marginEnd="2dp"
@@ -23,8 +24,7 @@
 
         <TextView
             android:id="@+id/txtQuantityRuneKernel"
-            android:layout_width="0dp"
-            android:layout_weight="3"
+            android:layout_width="25dp"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:textSize="16sp"

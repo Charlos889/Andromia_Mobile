@@ -54,10 +54,7 @@ class MainActivity : AppCompatActivity()
 
         changeFragment(MapFragment.newInstance(), false)
 
-        progressDialog = ProgressDialog(this)
-        progressDialog!!.isIndeterminate = true
-        progressDialog!!.setMessage("Chargement en cours...")
-        progressDialog!!.show()
+        afficherProgressBar()
     }
 
     override fun onListExplorationFragmentInteraction(item: Exploration?) {
@@ -310,8 +307,8 @@ class MainActivity : AppCompatActivity()
 
         val alert = AlertDialog.Builder(this)
 
-        alert.setTitle("Une erreur est survenue")
-        alert.setMessage("Veuillez vous reconnecter")
+        alert.setTitle("An error has occured")
+        alert.setMessage("Please reconnect")
         alert.setNeutralButton("OK") { dialog, which ->
             logout()
         }
@@ -354,7 +351,8 @@ class MainActivity : AppCompatActivity()
         // par contre, c'est exactement ce que je veux, donc ça reste la méthode la plus simple d'arriver à mon but
         progressDialog = ProgressDialog(this)
         progressDialog!!.isIndeterminate = true
-        progressDialog!!.setMessage("Chargement en cours...")
+        progressDialog!!.setMessage("Loading...")
+        progressDialog!!.setCancelable(false)
         progressDialog!!.show()
     }
 }

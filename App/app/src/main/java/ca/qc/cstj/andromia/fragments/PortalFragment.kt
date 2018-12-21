@@ -20,6 +20,7 @@ import ca.qc.cstj.andromia.models.Exploration
 import ca.qc.cstj.andromia.models.ExplorationBase
 import ca.qc.cstj.andromia.models.Explorer
 import com.bumptech.glide.Glide
+import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.httpPost
 import com.github.kittinunf.fuel.serialization.responseObject
@@ -113,10 +114,10 @@ class PortalFragment :   Fragment()
 
         val url = "$PORTALS_URL/$uuid"
         url.httpGet().responseObject<ExplorationBase>(json = JSON(strictMode = false)){ _, response, result ->
+        //url.httpGet().response{ _, response, result ->
             when(response.statusCode) {
                 200 -> {
                     val explorationRespose = result.get()
-
                     if(explorationRespose.unit.name != null) {
                         val dialog = CaptureUnitDialogFragment.newInstance(explorationRespose.unit, explorer, result.get())
                         dialog.isCancelable = false

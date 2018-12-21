@@ -121,7 +121,7 @@ class MainActivity : AppCompatActivity()
                     modifierTitre(explorer.username.toUpperCase())
                 }
                 R.id.nvmUnits -> {
-                    changeFragment(ListUnitFragment.newInstance(explorer.units))
+                    changeFragment(ListUnitFragment.newInstance())
                     modifierTitre(explorer.username.toUpperCase())
                 }
                 R.id.nvmExplorations -> {

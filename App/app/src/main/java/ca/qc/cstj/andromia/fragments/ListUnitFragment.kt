@@ -16,6 +16,7 @@ import ca.qc.cstj.andromia.R
 import ca.qc.cstj.andromia.adapters.UnitRecyclerViewAdapter
 import ca.qc.cstj.andromia.models.Pagination
 import ca.qc.cstj.andromia.models.Unit
+import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.fuel.serialization.responseObject
 import kotlinx.android.synthetic.main.fragment_exploration_list.*
@@ -26,7 +27,6 @@ import kotlinx.serialization.json.JSON
 /**
  * A fragment representing a list of Items.
  * Activities containing this fragment MUST implement the
- * [ListUnitFragment.OnListFragmentInteractionListener] interface.
  */
 class ListUnitFragment : Fragment() {
     private var listener: OnListUnitFragmentInteractionListener? = null
@@ -107,22 +107,24 @@ class ListUnitFragment : Fragment() {
         val userToken = preferences.getString("token", "")
         val username = preferences.getString("username", "")
 
-        val parameters = mutableListOf<Pair<String, Int>>()
-        parameters.add(Pair("pageLimit", 8))
 
         val path = if(page == null) {
-            "$EXPLORERS_URL/$username/units"
+            "$EXPLORERS_URL/$username/units?pageLimit=8"
         } else {
-            page
+            "$page&pageLimit=8"
         }
 
-        path.httpGet(parameters)
+        path.httpGet()
             .header(mapOf("Authorization" to "Bearer $userToken"))
-            .responseObject<Pagination<Unit>>(json = JSON(strictMode = false)) { _, response, result ->
+            .responseJson { _, response, result ->
                 when (response.statusCode) {
                     200 -> {
+
+                        val json = result.get()
+                        pagination = JSON.nonstrict.parse(Pagination.serializer(Unit.serializer()), json.content)
+
                         units.clear()
-                        units = result.get().items.toMutableList()
+                        units.addAll(pagination!!.items)
 
                         if (!units.isEmpty()) {
                             rcvUnits.adapter.notifyDataSetChanged()
@@ -172,9 +174,6 @@ class ListUnitFragment : Fragment() {
 
         // TODO: Customize parameter initialization
         @JvmStatic
-        fun newInstance(units: List<Unit>) =
-                ListUnitFragment().apply {
-                    this.units = units.toMutableList()
-                }
+        fun newInstance() = ListUnitFragment()
     }
 }

@@ -22,9 +22,10 @@ android:layout_height="match_parent">
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="10dp"
-        android:text="Vous n'avez fait auncune exploration pour l'instant.."
+        android:text="You haven't explored anywhere.."
         android:textSize="26sp"
         android:textColor="@android:color/black"
-        android:visibility="gone"/>
+        android:visibility="gone"
+        android:gravity="center"/>
 
 </android.support.constraint.ConstraintLayout>

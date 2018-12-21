@@ -29,7 +29,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_margin="10dp"
-        android:text="Vous ne possèdez aucune unit pour l'instant.."
+        android:text="You don't have any units.."
         android:textColor="@android:color/black"
         android:textSize="26sp"
         android:visibility="gone"

@@ -4,9 +4,9 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.PropertyValuesHolder
 import android.app.Activity
-import android.support.v4.app.DialogFragment
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.graphics.PointF
@@ -19,21 +19,13 @@ import android.util.Log
 import android.util.TypedValue
 import android.view.*
 import android.widget.Toast
-import ca.qc.cstj.andromia.EXPLORATIONS_URL
 import ca.qc.cstj.andromia.EXPLORERS_URL
-import ca.qc.cstj.andromia.PORTALS_URL
 import ca.qc.cstj.andromia.R
-import ca.qc.cstj.andromia.dialogs.CaptureUnitDialogFragment
-import ca.qc.cstj.andromia.dialogs.PortalNotFoundDialogFragment
-import ca.qc.cstj.andromia.dialogs.RunesFoundDialogFragment
-import ca.qc.cstj.andromia.models.ExplorationBase
 import ca.qc.cstj.andromia.models.Explorer
 import ca.qc.cstj.andromia.models.PositionExploration
 import com.bumptech.glide.Glide
 import com.github.kittinunf.fuel.android.extension.responseJson
 import com.github.kittinunf.fuel.httpGet
-import com.github.kittinunf.fuel.httpPost
-import com.github.kittinunf.fuel.serialization.responseObject
 import com.google.zxing.integration.android.IntentIntegrator
 import kotlinx.android.synthetic.main.fragment_map.*
 import kotlinx.serialization.json.JSON
@@ -133,7 +125,7 @@ class MapFragment : Fragment()
                             // on veut l'avertir du problème, sans nécessairement le bloquer d'utiliser l'application
                             // Sinon, on le déconnecte (ça sert à rien de le laisser continuer, on n'a pas ses infos)
                             if (listener!!.utilisateurExistant()) {
-                                Toast.makeText(this.context, "Une erreur est survenue...", Toast.LENGTH_LONG).show()
+                                Toast.makeText(this.context, "An error has occured...", Toast.LENGTH_LONG).show()
                             } else {
                                 listener!!.retourLogin()
                             }
@@ -170,7 +162,7 @@ class MapFragment : Fragment()
                             // on veut l'avertir du problème, sans nécessairement le bloquer d'utiliser l'application
                             // Sinon, on le déconnecte (ça sert à rien de le laisser continuer, on n'a pas ses infos)
                             if (listener!!.utilisateurExistant()) {
-                                Toast.makeText(this.context, "Une erreur est survenue...", Toast.LENGTH_LONG).show()
+                                Toast.makeText(this.context, "An error has occured...", Toast.LENGTH_LONG).show()
                             } else {
                                 listener!!.retourLogin()
                             }
@@ -236,6 +228,18 @@ class MapFragment : Fragment()
         }
 
         super.onStart()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+        super.onConfigurationChanged(newConfig)
+
+        imgMap.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                imgMap.viewTreeObserver.removeOnGlobalLayoutListener(this)
+
+                positionnerBouton()
+            }
+        })
     }
 
     override fun onAttach(context: Context) {

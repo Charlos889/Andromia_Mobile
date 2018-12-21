@@ -12,7 +12,7 @@
 
             <TextView
                 android:id="@+id/txvNomUnit"
-                android:layout_width="150dp"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:textColor="@android:color/black"
                 android:textSize="35sp"
@@ -34,6 +34,7 @@
                 android:id="@+id/txvWeapons"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="5dp"
                 android:text="Weapons :"
                 android:textSize="20sp"
                 app:layout_constraintTop_toBottomOf="@+id/imgDetailUnit"/>
@@ -48,6 +49,7 @@
                 android:id="@+id/txvAbilities"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="5dp"
                 android:text="Abilities :"
                 android:textSize="20sp"
                 app:layout_constraintTop_toBottomOf="@+id/rcvWeapons"/>
@@ -62,6 +64,7 @@
                 android:id="@+id/txvKernel"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_margin="5dp"
                 android:text="Kernel :"
                 android:textSize="20sp"
                 app:layout_constraintTop_toBottomOf="@+id/rcvAbilities"/>

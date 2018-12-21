@@ -13,5 +13,5 @@ data class Explorer constructor(
         val email: String,
         val href: String) : BaseObservable() {
 
-    constructor() : this(Runes(), LienPage(""), Inox(0), LienPage(""), "Andromia", "", "")
+    constructor() : this(Runes(), LienPage(""), Inox(0), LienPage(""), "", "", "")
 }

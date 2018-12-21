@@ -78,11 +78,17 @@ class ListUnitFragment : Fragment() {
             })
         }
 
-
-        if(units.isEmpty()) {
-            txvNoUnit.visibility = View.VISIBLE
+        if(units.isEmpty())
             getUnits(null)
-        }
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+        super.onConfigurationChanged(newConfig)
+
+        if(resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT)
+            gridLayoutManager = GridLayoutManager(activity, 2)
+        else if(resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
+            gridLayoutManager = GridLayoutManager(activity, 3)
     }
 
     override fun onAttach(context: Context) {
@@ -123,7 +129,6 @@ class ListUnitFragment : Fragment() {
                         val json = result.get()
                         pagination = JSON.nonstrict.parse(Pagination.serializer(Unit.serializer()), json.content)
 
-                        units.clear()
                         units.addAll(pagination!!.items)
 
                         if (!units.isEmpty()) {

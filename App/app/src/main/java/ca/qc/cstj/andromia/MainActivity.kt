@@ -184,13 +184,12 @@ class MainActivity : AppCompatActivity()
     }
 
     override fun onPortalScanned(uuid: String, explorer: Explorer) {
-        changeFragment(PortalFragment.newInstance(uuid, explorer), false)
+        changeFragment(PortalFragment.newInstance(uuid, explorer), true)
     }
 
     override fun onExplorationDone() {
-        changeFragment(MapFragment.newInstance(), false)
+        supportFragmentManager.popBackStackImmediate()
     }
-
 
     private fun changeFragment(newFragment : Fragment, saveInBackstack : Boolean = true, animate:Boolean = true, tag:String = newFragment.javaClass.name) {
 

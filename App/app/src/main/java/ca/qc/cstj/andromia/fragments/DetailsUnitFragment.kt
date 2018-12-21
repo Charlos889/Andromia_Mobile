@@ -5,12 +5,15 @@ import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
+import android.support.v7.widget.LinearLayoutManager
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
 import ca.qc.cstj.andromia.R
+import ca.qc.cstj.andromia.adapters.AbilitiesRecyclerViewAdapter
 import ca.qc.cstj.andromia.adapters.RunesRecyclerViewAdapter
+import ca.qc.cstj.andromia.adapters.WeaponsRecyclerViewAdapter
 import ca.qc.cstj.andromia.models.Runes
 import ca.qc.cstj.andromia.models.Unit
 import com.github.kittinunf.fuel.android.core.Json
@@ -55,6 +58,11 @@ class DetailsUnitFragment : Fragment() {
         rcvKernel.layoutManager = GridLayoutManager(view.context, 4)
         rcvKernel.adapter = RunesRecyclerViewAdapter(mapRunes, false)
 
+        rcvAbilities.layoutManager = LinearLayoutManager(view.context)
+        rcvAbilities.adapter = AbilitiesRecyclerViewAdapter(unit?.runes!!.abilities)
+
+        rcvWeapons.layoutManager = LinearLayoutManager(view.context)
+        rcvWeapons.adapter = WeaponsRecyclerViewAdapter(unit?.runes!!.weapons)
     }
 
     fun RunesObjectToMap(runes : Runes) : Map<String, Int> {

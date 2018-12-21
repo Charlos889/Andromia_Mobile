@@ -104,9 +104,9 @@ class CaptureUnitDialogFragment : DialogFragment() {
 
         Picasso.with(view.context).load(unit!!.imageURL).into(imgUnitDialog)
 
-        rcvKernel.layoutManager = GridLayoutManager(view.context, 5)
+        rcvKernel.layoutManager = GridLayoutManager(view.context, 3)
         rcvKernel.adapter = RunesRecyclerViewAdapter(mapRunesKernel, true)
-        rcvRunesExplorer.layoutManager = GridLayoutManager(view.context, 5)
+        rcvRunesExplorer.layoutManager = GridLayoutManager(view.context, 3)
         rcvRunesExplorer.adapter = RunesRecyclerViewAdapter(mapRunesExplorer, true)
 
         txvLife.text = "${txvLife.text}${unit!!.life.toString()}"

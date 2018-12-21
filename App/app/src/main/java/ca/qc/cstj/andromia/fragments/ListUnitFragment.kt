@@ -86,9 +86,9 @@ class ListUnitFragment : Fragment() {
         super.onConfigurationChanged(newConfig)
 
         if(resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT)
-            gridLayoutManager = GridLayoutManager(activity, 2)
+            gridLayoutManager!!.spanCount = 2
         else if(resources.configuration.orientation == Configuration.ORIENTATION_LANDSCAPE)
-            gridLayoutManager = GridLayoutManager(activity, 3)
+            gridLayoutManager!!.spanCount = 3
     }
 
     override fun onAttach(context: Context) {

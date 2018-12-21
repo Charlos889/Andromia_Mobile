@@ -6,6 +6,7 @@ import android.animation.PropertyValuesHolder
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.graphics.BitmapFactory
 import android.graphics.Matrix
 import android.graphics.PointF
@@ -123,7 +124,7 @@ class MapFragment : Fragment()
                             // on veut l'avertir du problème, sans nécessairement le bloquer d'utiliser l'application
                             // Sinon, on le déconnecte (ça sert à rien de le laisser continuer, on n'a pas ses infos)
                             if (listener!!.utilisateurExistant()) {
-                                Toast.makeText(this.context, "Une erreur est survenue...", Toast.LENGTH_LONG).show()
+                                Toast.makeText(this.context, "An error has occured...", Toast.LENGTH_LONG).show()
                             } else {
                                 listener!!.retourLogin()
                             }
@@ -160,7 +161,7 @@ class MapFragment : Fragment()
                             // on veut l'avertir du problème, sans nécessairement le bloquer d'utiliser l'application
                             // Sinon, on le déconnecte (ça sert à rien de le laisser continuer, on n'a pas ses infos)
                             if (listener!!.utilisateurExistant()) {
-                                Toast.makeText(this.context, "Une erreur est survenue...", Toast.LENGTH_LONG).show()
+                                Toast.makeText(this.context, "An error has occured...", Toast.LENGTH_LONG).show()
                             } else {
                                 listener!!.retourLogin()
                             }
@@ -226,6 +227,18 @@ class MapFragment : Fragment()
         }
 
         super.onStart()
+    }
+
+    override fun onConfigurationChanged(newConfig: Configuration?) {
+        super.onConfigurationChanged(newConfig)
+
+        imgMap.viewTreeObserver.addOnGlobalLayoutListener(object : ViewTreeObserver.OnGlobalLayoutListener {
+            override fun onGlobalLayout() {
+                imgMap.viewTreeObserver.removeOnGlobalLayoutListener(this)
+
+                positionnerBouton()
+            }
+        })
     }
 
     override fun onAttach(context: Context) {

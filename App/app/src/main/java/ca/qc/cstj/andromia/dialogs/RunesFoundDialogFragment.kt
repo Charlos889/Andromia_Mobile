@@ -52,6 +52,7 @@ class RunesFoundDialogFragment : DialogFragment() {
             val builder = AlertDialog.Builder(it)
 
             val view = activity!!.layoutInflater.inflate(R.layout.dialog_runes_found, null)
+            val titleView = activity!!.layoutInflater.inflate(R.layout.txv_custom_title, null) as TextView
 
             setViewContent(view)
 
@@ -61,11 +62,12 @@ class RunesFoundDialogFragment : DialogFragment() {
             } else {
                 "You arrived at $destination. You found no runes while traveling.."
             }
+            titleView.text = title
 
             if(runesFound)
                 builder.setView(view)
 
-            builder.setTitle(title)
+            builder.setCustomTitle(titleView)
                     .setNegativeButton("Okay", {dialog, id ->
                         listener!!.onRunesNegativeClick(this)
                     })

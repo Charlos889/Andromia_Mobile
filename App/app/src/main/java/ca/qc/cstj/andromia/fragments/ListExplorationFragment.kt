@@ -82,7 +82,6 @@ class ListExplorationFragment : Fragment() {
         }
 
         if (explorations.isEmpty()) {
-            txvNoExploration.visibility = View.VISIBLE
             obtenirExplorations(null)
         }
     }

@@ -1,35 +1,51 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.constraint.ConstraintLayout
+
+<ScrollView
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:layout_height="match_parent"
-    android:layout_width="match_parent">
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
 
-    <TextView
-        android:id="@+id/txvNomUnit"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:textColor="@android:color/black"
-        android:textSize="30sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <ImageView
-        android:id="@+id/imgDetailUnit"
-        android:layout_width="175dp"
-        android:layout_height="175dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginStart="10dp"
-        app:layout_constraintTop_toBottomOf="@+id/txvNomUnit"
-        app:layout_constraintStart_toStartOf="parent"
-        />
-
-    <android.support.v7.widget.RecyclerView
-        android:id="@+id/rcvKernel"
+    <android.support.constraint.ConstraintLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        app:layout_constraintBottom_toBottomOf="parent">
-    </android.support.v7.widget.RecyclerView>
+        android:layout_height="wrap_content">
 
-</android.support.constraint.ConstraintLayout>
+            <TextView
+                android:id="@+id/txvNomUnit"
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:textColor="@android:color/black"
+                android:textSize="30sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <ImageView
+                android:id="@+id/imgDetailUnit"
+                android:layout_width="175dp"
+                android:layout_height="175dp"
+                android:layout_marginTop="10dp"
+                android:layout_marginStart="10dp"
+                app:layout_constraintTop_toBottomOf="@+id/txvNomUnit"
+                app:layout_constraintStart_toStartOf="parent"
+                />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rcvWeapons"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/imgDetailUnit"/>
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rcvAbilities"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@id/rcvWeapons" />
+
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/rcvKernel"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/rcvAbilities" />
+
+    </android.support.constraint.ConstraintLayout>
+</ScrollView>
